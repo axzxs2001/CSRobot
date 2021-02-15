@@ -22,9 +22,9 @@ namespace CSRebot
         }
 
         static Dictionary<string, Func<string[], bool>> _infoDic = new Dictionary<string, Func<string[], bool>> {
-            { "--info", Info},
-            { "-h",Help},
-            {"build",EntityBuild}
+            {"--info", Info},
+            {"-h",Help},
+            {"gen",GenerateEntity}
         };
         static bool Help(string[] args)
         {
@@ -53,12 +53,54 @@ Usage:
         }
 
 
-        static bool EntityBuild(string[] args)
+        static IDictionary<string, string> GetOptions(string[] args)
         {
-            var nnn = new MySQLCreater();
-            var k = nnn.GetDataBase();
-            var build = new CSharpBuild();
-            return true;
+            var options = new Dictionary<string, string>();
+            for (var i = 2; i < args.Length; i++)
+            {
+                var arr = args[i].Split("=");
+                if (arr.Length < 2)
+                {
+                    throw new Exception("");
+                }
+                options.Add(arr[0], arr[1]);
+            }
+            return options;
+        }
+        static bool GenerateEntity(string[] args)
+        {
+            //csrebot gen -dbtype=mysql -to=cs -out=c:/abc
+            var options = GetOptions(args);
+            ITraverser traverser = null;
+            ILanguageBuilder builder = null;
+            switch (options["-dbtype"].ToLower())
+            {
+                case "mysql":
+                    traverser = new MySqlTraverser();
+                    break;
+                case "mssql":
+                    break;
+                case "postgresql":
+                    break;
+            }
+            switch (options["-to"].ToLower())
+            {
+                case "cs":
+                    builder = new CSharpBuilder();
+                    break;
+                case "go":
+                    builder = new GoBuilder();
+                    break;
+            }
+            if (traverser != null && builder != null)
+            {
+                builder.Build(traverser.Traverse(), options);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
         static void Run(string[] args)
         {
@@ -69,8 +111,5 @@ Usage:
         }
 
     }
-
-    // public delegate bool Funcation(string[] args);
-
 
 }

@@ -8,23 +8,23 @@ using System.Threading.Tasks;
 namespace CSRebot
 {
 
-    public interface SourceBuild
+    public interface ILanguageBuilder
     {
-        void Build(EntityDirectory entityDirectory);
+        void Build(EntityHub entityHub, IDictionary<string, string> options);
     }
 
-    public class CSharpBuild : SourceBuild
+    public class CSharpBuilder : ILanguageBuilder
     {
-        public void Build(EntityDirectory entityDirectory)
+        public void Build(EntityHub entityHub, IDictionary<string, string> options)
         {
-            var basePath = $"{Directory.GetCurrentDirectory()}/{entityDirectory.EntityDirectoryName}";
+            var basePath = $"{Directory.GetCurrentDirectory()}/{entityHub.EntityDirectoryName}";
             Directory.CreateDirectory(basePath);
-            foreach (var entity in entityDirectory.Entities)
+            foreach (var entity in entityHub.Entities)
             {
                 var codeString = new StringBuilder();
                 codeString.AppendLine(@$"using System;
 
-namespace {entityDirectory.EntityDirectoryName}
+namespace {entityHub.EntityDirectoryName}
 {{
     {(string.IsNullOrEmpty(entity.EntityDescribe) ? "" : @$"/// <summary>
     /// {entity.EntityDescribe}
@@ -46,6 +46,14 @@ namespace {entityDirectory.EntityDirectoryName}
 
                 File.WriteAllText($"{basePath}/{entity.EntityName}.cs", codeString.ToString(), Encoding.UTF8);
             }
+        }
+    }
+
+    public class GoBuilder : ILanguageBuilder
+    {
+        public void Build(EntityHub entityHub, IDictionary<string, string> options)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -36,7 +36,7 @@ namespace CSRebot
 
     }
 
-    public class EntityDirectory
+    public class EntityHub
     {
 
         public string EntityDirectoryName { get; set; }
@@ -45,17 +45,17 @@ namespace CSRebot
 
     }
 
-    public interface DataBaseCreater
+    public interface ITraverser
     {
-        EntityDirectory GetDataBase();
+        EntityHub Traverse();
     }
-    public class MySQLCreater : DataBaseCreater
+    public class MySqlTraverser : ITraverser
     {
      
         string connectionString = "server=127.0.0.1;database=testdb;uid=root;pwd=gsw2021;";
-        EntityDirectory GetEntity(string databaseName)
+        EntityHub GetEntity(string databaseName)
         {
-            var entityDir = new EntityDirectory()
+            var entityDir = new EntityHub()
             {
                 EntityDirectoryName = databaseName
             };
@@ -80,7 +80,7 @@ namespace CSRebot
         }
 
 
-        void GetFields(EntityDirectory entityDir)
+        void GetFields(EntityHub entityDir)
         {
             foreach (var entity in entityDir.Entities)
             {
@@ -101,7 +101,7 @@ namespace CSRebot
                 }
             }
         }
-        public EntityDirectory GetDataBase()
+        public EntityHub Traverse()
         {
             return GetEntity("testdb");
         }
