@@ -5,53 +5,15 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CSRebot.Entity;
 using MySql.Data;
 using MySql.Data.MySqlClient;
 
-namespace CSRebot
+namespace CSRebot.Traverser
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    public class Field
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        public string FieldName
-        { get; set; }
-        public string FieldDescribe { get; set; }
-
-        public string DBType { get; set; }
-    }
-
-
-    public class Entity
-    {
-        public string EntityName { get; set; }
-
-        public string EntityDescribe { get; set; }
-
-        public List<Field> Fields { get; set; } = new List<Field>();
-
-    }
-
-    public class EntityHub
-    {
-
-        public string EntityDirectoryName { get; set; }
-
-        public List<Entity> Entities { get; set; } = new List<Entity>();
-
-    }
-
-    public interface ITraverser
-    {
-        EntityHub Traverse();
-    }
     public class MySqlTraverser : ITraverser
     {
-     
+
         string connectionString = "server=127.0.0.1;database=testdb;uid=root;pwd=gsw2021;";
         EntityHub GetEntity(string databaseName)
         {
@@ -68,7 +30,7 @@ namespace CSRebot
                 var reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    var entity = new Entity();
+                    var entity = new CSRebot.Entity.Entity();
                     entity.EntityName = reader.GetFieldValue<string>("entityname");
                     entity.EntityDescribe = reader.GetFieldValue<string>("entitydescribe");
                     entityDir.Entities.Add(entity);

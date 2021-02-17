@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CSRebot.LanguageBuilder;
+using CSRebot.Traverser;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -88,8 +90,7 @@ Usage:
                 case "cs":
                     builder = new CSharpBuilder();
                     break;
-                case "go":
-                    builder = new GoBuilder();
+                case "go":                  
                     break;
             }
             if (traverser != null && builder != null)

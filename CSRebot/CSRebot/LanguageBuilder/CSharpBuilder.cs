@@ -1,17 +1,13 @@
-﻿using System;
+﻿using CSRebot.Entity;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CSRebot
+namespace CSRebot.LanguageBuilder
 {
-
-    public interface ILanguageBuilder
-    {
-        void Build(EntityHub entityHub, IDictionary<string, string> options);
-    }
 
     public class CSharpBuilder : ILanguageBuilder
     {
@@ -37,7 +33,7 @@ namespace {entityHub.EntityDirectoryName}
                     codeString.AppendLine(@$"        {(string.IsNullOrEmpty(field.FieldDescribe) ? "" : @$"/// <summary>
         /// {field.FieldDescribe}
         /// </summary>")}
-        public string {field.FieldName}
+        public {(_typeMap.ContainsKey(field.DBType) ? _typeMap[field.DBType] : "string")} {field.FieldName}
         {{ get; set; }}");
                 }
                 codeString.AppendLine("    }");
@@ -47,13 +43,18 @@ namespace {entityHub.EntityDirectoryName}
                 File.WriteAllText($"{basePath}/{entity.EntityName}.cs", codeString.ToString(), Encoding.UTF8);
             }
         }
-    }
 
-    public class GoBuilder : ILanguageBuilder
-    {
-        public void Build(EntityHub entityHub, IDictionary<string, string> options)
+        Dictionary<string, string> _typeMap;
+        public CSharpBuilder()
         {
-            throw new NotImplementedException();
+            _typeMap = new Dictionary<string, string>
+            {
+                {"","" },
+
+
+            };
         }
     }
+
+
 }
