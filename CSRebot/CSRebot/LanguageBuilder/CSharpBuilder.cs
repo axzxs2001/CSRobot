@@ -49,12 +49,36 @@ namespace {entityHub.EntityDirectoryName}
         {
             _typeMap = new Dictionary<string, string>
             {
-                {"","" },
-
-
+                {"char","char" },
+                {"varchar","string" },
+                {"tinytext","string" },
+                {"text","string" },
+                {"blob","string" },
+                {"mediumtext","string" },
+                {"mediumblob","string" },
+                {"longblob","string" },
+                {"longtext","string" },
+                {"tinyint","short" },
+                {"smallint","short" },
+                {"mediumint","short" },
+                {"int","int" },
+                {"bigint","long" },
+                {"float","float" },
+                {"double","double" },
+                {"decimal","decimal" },
+                {"date","DateTime" },
+                {"datetime","DateTime" },
+                {"timestamp","string" },
+                {"time","DateTime" },               
+                {"boolean","bool" },            
             };
         }
     }
 
 
 }
+
+
+
+
+

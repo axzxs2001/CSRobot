@@ -12,6 +12,7 @@ namespace CSRebot
     {
         static void Main(string[] args)
         {
+            args = new string[] {"gen","-dbtype=mysql","-to=cs" };
             if (args.Length == 0)
             {
                 _infoDic["--info"](args);
@@ -58,7 +59,7 @@ Usage:
         static IDictionary<string, string> GetOptions(string[] args)
         {
             var options = new Dictionary<string, string>();
-            for (var i = 2; i < args.Length; i++)
+            for (var i = 1; i < args.Length; i++)
             {
                 var arr = args[i].Split("=");
                 if (arr.Length < 2)
