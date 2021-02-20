@@ -7,10 +7,12 @@ using System.Threading.Tasks;
 
 namespace CSRebot.LanguageBuilder
 {
-
+    /// <summary>
+    /// 完成对应编程语言实体类生成
+    /// </summary>
     public interface ILanguageBuilder
     {
-        void Build(EntityHub entityHub, IDictionary<string, string> options);
+        void Build(DataBase database, CommandOptions options);
     }
 
 }

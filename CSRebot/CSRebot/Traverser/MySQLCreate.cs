@@ -15,11 +15,11 @@ namespace CSRebot.Traverser
     {
 
         string connectionString = "server=127.0.0.1;database=testdb;uid=root;pwd=gsw2021;";
-        EntityHub GetEntity(string databaseName)
+        DataBase GetEntity(string databaseName)
         {
-            var entityDir = new EntityHub()
+            var entityDir = new DataBase()
             {
-                EntityDirectoryName = databaseName
+                DataBaseName = databaseName
             };
 
             using (var con = new MySqlConnection(connectionString))
@@ -30,10 +30,10 @@ namespace CSRebot.Traverser
                 var reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    var entity = new CSRebot.Entity.Entity();
-                    entity.EntityName = reader.GetFieldValue<string>("entityname");
-                    entity.EntityDescribe = reader.GetFieldValue<string>("entitydescribe");
-                    entityDir.Entities.Add(entity);
+                    var entity = new CSRebot.Entity.Table();
+                    entity.TableName = reader.GetFieldValue<string>("entityname");
+                    entity.TableDescribe = reader.GetFieldValue<string>("entitydescribe");
+                    entityDir.Tables.Add(entity);
                 }
                 con.Close();
             }
@@ -42,11 +42,11 @@ namespace CSRebot.Traverser
         }
 
 
-        void GetFields(EntityHub entityDir)
+        void GetFields(DataBase entityDir)
         {
-            foreach (var entity in entityDir.Entities)
+            foreach (var entity in entityDir.Tables)
             {
-                var sql = @$"select column_name as fieldname,data_type as dbtype,column_comment as fielddescribe from information_schema.columns where table_name = '{entity.EntityName}' ";
+                var sql = @$"select column_name as fieldname,data_type as dbtype,column_comment as fielddescribe from information_schema.columns where table_name = '{entity.TableName}' ";
                 using (var con = new MySqlConnection(connectionString))
                 {
                     var cmd = new MySqlCommand(sql, con);
@@ -63,7 +63,7 @@ namespace CSRebot.Traverser
                 }
             }
         }
-        public EntityHub Traverse()
+        public DataBase Traverse()
         {
             return GetEntity("testdb");
         }

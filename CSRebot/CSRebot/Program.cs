@@ -12,7 +12,7 @@ namespace CSRebot
     {
         static void Main(string[] args)
         {
-            args = new string[] {"gen","-dbtype=mysql","-to=cs" };
+            args = new string[] { "gen", "-dbtype=mysql", "-to=cs" };
             if (args.Length == 0)
             {
                 _infoDic["--info"](args);
@@ -56,9 +56,9 @@ Usage:
         }
 
 
-        static IDictionary<string, string> GetOptions(string[] args)
+        static CommandOptions GetOptions(string[] args)
         {
-            var options = new Dictionary<string, string>();
+            var options = new CommandOptions();
             for (var i = 1; i < args.Length; i++)
             {
                 var arr = args[i].Split("=");
@@ -91,7 +91,7 @@ Usage:
                 case "cs":
                     builder = new CSharpBuilder();
                     break;
-                case "go":                  
+                case "go":
                     break;
             }
             if (traverser != null && builder != null)
@@ -111,6 +111,12 @@ Usage:
                 _infoDic[args[0]](args);
             }
         }
+
+    }
+
+
+    public class CommandOptions : Dictionary<string, string>
+    {
 
     }
 

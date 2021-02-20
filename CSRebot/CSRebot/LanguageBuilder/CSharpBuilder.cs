@@ -11,24 +11,24 @@ namespace CSRebot.LanguageBuilder
 
     public class CSharpBuilder : ILanguageBuilder
     {
-        public void Build(EntityHub entityHub, IDictionary<string, string> options)
+        public void Build(DataBase database, IDictionary<string, string> options)
         {
-            var basePath = $"{Directory.GetCurrentDirectory()}/{entityHub.EntityDirectoryName}";
+            var basePath = $"{Directory.GetCurrentDirectory()}/{database.DataBaseName}";
             Directory.CreateDirectory(basePath);
-            foreach (var entity in entityHub.Entities)
+            foreach (var table in database.Tables)
             {
                 var codeString = new StringBuilder();
                 codeString.AppendLine(@$"using System;
 
-namespace {entityHub.EntityDirectoryName}
+namespace {database.DataBaseName}
 {{
-    {(string.IsNullOrEmpty(entity.EntityDescribe) ? "" : @$"/// <summary>
-    /// {entity.EntityDescribe}
+    {(string.IsNullOrEmpty(table.TableDescribe) ? "" : @$"/// <summary>
+    /// {table.TableDescribe}
     /// </summary>")}
-    public class {entity.EntityName}
+    public class {table.TableName}
     {{");
 
-                foreach (var field in entity.Fields)
+                foreach (var field in table.Fields)
                 {
                     codeString.AppendLine(@$"        {(string.IsNullOrEmpty(field.FieldDescribe) ? "" : @$"/// <summary>
         /// {field.FieldDescribe}
@@ -40,7 +40,7 @@ namespace {entityHub.EntityDirectoryName}
                 codeString.AppendLine("}");
                 codeString.AppendLine();
 
-                File.WriteAllText($"{basePath}/{entity.EntityName}.cs", codeString.ToString(), Encoding.UTF8);
+                File.WriteAllText($"{basePath}/{table.TableName}.cs", codeString.ToString(), Encoding.UTF8);
             }
         }
 

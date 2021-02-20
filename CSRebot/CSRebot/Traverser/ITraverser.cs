@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CSRebot.Entity;
+
 
 namespace CSRebot.Traverser
 {
+    /// <summary>
+    /// 完成从数据库生成数据库结构实体
+    /// </summary>
     public interface ITraverser
     {
-        Entity.EntityHub Traverse();
+        DataBase Traverse();
     }
 }

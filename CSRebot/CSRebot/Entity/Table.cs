@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace CSRebot.Entity
 {
-    public class Entity
+    public class Table
     {
-        public string EntityName { get; set; }
+        public string TableName { get; set; }
 
-        public string EntityDescribe { get; set; }
+        public string TableDescribe { get; set; }
 
         public List<Field> Fields { get; set; } = new List<Field>();
 

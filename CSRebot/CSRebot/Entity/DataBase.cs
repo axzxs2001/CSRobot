@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace CSRebot.Entity
 {
-    public class EntityHub
+    public class DataBase
     {
 
-        public string EntityDirectoryName { get; set; }
+        public string DataBaseName { get; set; }
 
-        public List<Entity> Entities { get; set; } = new List<Entity>();
+        public List<Table> Tables { get; set; } = new List<Table>();
 
     }
 }
