@@ -1,10 +1,7 @@
-﻿using CSRebot.LanguageBuilder;
-using CSRebot.Traverser;
+﻿using CSRebot.GenerateEntityTools;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
-using System.Text;
 
 namespace CSRebot
 {
@@ -12,25 +9,38 @@ namespace CSRebot
     {
         static void Main(string[] args)
         {
+            //多语言支持
             //args = new string[] { "gen", "-dbtype=mysql", "-to=cs" };
-            args = new string[] { "gen", "-dbtype=mysql", "-to=cs", "-tep=https://github.com/axzxs2001/CSRebot/blob/main/CSRebot/gen/gen_cs_record.cs" };
-            if (args.Length == 0)
-            {
-                _infoDic["--info"](args);
-                return;
-            }
-            else
-            {
-                Run(args);
-            }
+            //csrebot gen -dbtype=mysql -to=cs -out=c:/abc
+            args = new string[] { "gen", "-h", "--dbtype=mysql", "--to=cs", "--tep=https://raw.githubusercontent.com/axzxs2001/CSRebot/main/CSRebot/gen/gen_cs_record.cs" };
+            CSRebotTools.Run(args);
         }
-
-        static Dictionary<string, Func<string[], bool>> _infoDic = new Dictionary<string, Func<string[], bool>> {
+    }
+    static class CSRebotTools
+    {
+        static Dictionary<string, Func<CommandOptions, bool>> _csRebotDic;
+        static CSRebotTools()
+        {
+            _csRebotDic = new Dictionary<string, Func<CommandOptions, bool>> {
             {"--info", Info},
             {"-h",Help},
-            {"gen",GenerateEntity}
+            {"gen",GenerateEntityTool.GenerateEntity}
         };
-        static bool Help(string[] args)
+        }
+        public static void Run(string[] args)
+        {
+            var options = GetOptions(args);
+            if (args.Length == 0)
+            {
+                _csRebotDic["--info"](options);
+                return;
+            }
+            if (_csRebotDic.ContainsKey(args[0]))
+            {
+                _csRebotDic[args[0]](options);
+            }
+        }
+        static bool Help(CommandOptions options)
         {
             Console.WriteLine(@$"
 Version {Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion.ToString()}
@@ -40,7 +50,7 @@ Version {Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVer
 ");
             return true;
         }
-        static bool Info(string[] args)
+        static bool Info(CommandOptions options)
         {
             Console.WriteLine(@$"
 CSRebot v{Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion.ToString()}
@@ -55,8 +65,6 @@ Usage:
 ");
             return true;
         }
-
-
         static CommandOptions GetOptions(string[] args)
         {
             var options = new CommandOptions();
@@ -65,60 +73,14 @@ Usage:
                 var arr = args[i].Split("=");
                 if (arr.Length < 2)
                 {
-                    throw new Exception("");
+                    options.Add(arr[0], null);
                 }
-                options.Add(arr[0], arr[1]);
+                else
+                {
+                    options.Add(arr[0], arr[1]);
+                }
             }
             return options;
         }
-        static bool GenerateEntity(string[] args)
-        {
-            //csrebot gen -dbtype=mysql -to=cs -out=c:/abc
-            var options = GetOptions(args);
-            ITraverser traverser = null;
-            IBuilder builder = null;
-            switch (options["-dbtype"].ToLower())
-            {
-                case "mysql":
-                    traverser = new MySqlTraverser();
-                    break;
-                case "mssql":
-                    break;
-                case "postgresql":
-                    break;
-            }
-            switch (options["-to"].ToLower())
-            {
-                case "cs":
-                    builder = new CSharpBuilder();
-                    break;
-                case "go":
-                    break;
-            }
-            if (traverser != null && builder != null)
-            {
-                builder.Build(traverser.Traverse(), options);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        static void Run(string[] args)
-        {
-            if (_infoDic.ContainsKey(args[0]))
-            {
-                _infoDic[args[0]](args);
-            }
-        }
-
     }
-
-
-    public class CommandOptions : Dictionary<string, string>
-    {
-
-    }
-
 }

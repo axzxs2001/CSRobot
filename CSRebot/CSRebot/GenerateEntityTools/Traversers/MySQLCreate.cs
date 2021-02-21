@@ -5,11 +5,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CSRebot.Entity;
+using CSRebot.GenerateEntityTools.Entity;
 using MySql.Data;
 using MySql.Data.MySqlClient;
 
-namespace CSRebot.Traverser
+namespace CSRebot.GenerateEntityTools.Traversers
 {
     public class MySqlTraverser : ITraverser
     {
@@ -30,7 +30,7 @@ namespace CSRebot.Traverser
                 var reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    var entity = new CSRebot.Entity.Table();
+                    var entity = new Table();
                     entity.TableName = reader.GetFieldValue<string>("entityname");
                     entity.TableDescribe = reader.GetFieldValue<string>("entitydescribe");
                     entityDir.Tables.Add(entity);

@@ -1,7 +1,8 @@
-﻿using CSRebot.Entity;
+﻿
 
+using CSRebot.GenerateEntityTools.Entity;
 
-namespace CSRebot.Traverser
+namespace CSRebot.GenerateEntityTools.Traversers
 {
     /// <summary>
     /// 完成从数据库生成数据库结构实体

@@ -1,4 +1,5 @@
-﻿using CSRebot.Entity;
+﻿
+using CSRebot.GenerateEntityTools.Entity;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,21 +9,31 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CSRebot.LanguageBuilder
+namespace CSRebot.GenerateEntityTools.Builders
 {
 
     public class CSharpBuilder : IBuilder
     {
         public void Build(DataBase database, CommandOptions options)
         {
+            //取模版
             var template = "";
-            if (string.IsNullOrEmpty(options["-tep"]))
+            if (!string.IsNullOrEmpty(options["--tep"]))
             {
-                template = GetTamplate(options["-tep"]);
+                template = GetTamplate(options["--tep"]);
             }
-
-            var basePath = $"{Directory.GetCurrentDirectory()}/{database.DataBaseName}";
-            Directory.CreateDirectory(basePath);
+            //取输出路径
+            var basePath = "";
+            if (!string.IsNullOrEmpty(options["--out"]))
+            {
+                basePath = options["--out"];
+            }
+            else
+            {
+                basePath = $"{Directory.GetCurrentDirectory()}/{database.DataBaseName}";
+                Directory.CreateDirectory(basePath);
+            }
+            //生成实体类
             foreach (var table in database.Tables)
             {
                 var codeString = GetCodeString(database.DataBaseName, table, template);
