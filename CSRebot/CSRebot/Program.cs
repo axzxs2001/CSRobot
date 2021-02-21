@@ -12,7 +12,8 @@ namespace CSRebot
     {
         static void Main(string[] args)
         {
-            args = new string[] { "gen", "-dbtype=mysql", "-to=cs" };
+            //args = new string[] { "gen", "-dbtype=mysql", "-to=cs" };
+            args = new string[] { "gen", "-dbtype=mysql", "-to=cs", "-tep=https://github.com/axzxs2001/CSRebot/blob/main/CSRebot/gen/gen_cs_record.cs" };
             if (args.Length == 0)
             {
                 _infoDic["--info"](args);

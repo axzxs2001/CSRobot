@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample", "Sample\Sample.csp
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "gen", "gen", "{DD13421A-0496-4581-9869-9265E34DF7CB}"
 	ProjectSection(SolutionItems) = preProject
-		gen\gen_cs_record..cs = gen\gen_cs_record..cs
+		gen\gen_cs_record.cs = gen\gen_cs_record.cs
 	EndProjectSection
 EndProject
 Global

@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,18 +15,26 @@ namespace CSRebot.LanguageBuilder
     {
         public void Build(DataBase database, CommandOptions options)
         {
+            var template = "";
+            if (string.IsNullOrEmpty(options["-tep"]))
+            {
+                template = GetTamplate(options["-tep"]);
+            }
+
             var basePath = $"{Directory.GetCurrentDirectory()}/{database.DataBaseName}";
             Directory.CreateDirectory(basePath);
             foreach (var table in database.Tables)
             {
-                var codeString = GetCodeString(database.DataBaseName, table);
+                var codeString = GetCodeString(database.DataBaseName, table, template);
                 File.WriteAllText($"{basePath}/{table.TableName}.cs", codeString.ToString(), Encoding.UTF8);
             }
         }
 
-        private string GetCodeString(string dataBaseName, Table table)
+        private string GetCodeString(string dataBaseName, Table table, string template = null)
         {
-            var template = @"
+            if (string.IsNullOrEmpty(template))
+            {
+                template = @"
 using System;
 
 namespace ${DataBaseName}
@@ -44,6 +54,7 @@ namespace ${DataBaseName}
     }
 }
 ";
+            }
             template = template.Replace("${DataBaseName}", dataBaseName);
             template = template.Replace("${TableDescribe}", table.TableDescribe);
             template = template.Replace("${TableName}", table.TableName);
@@ -71,6 +82,29 @@ namespace ${DataBaseName}
                 fields.Append(fieldTamplateValue);
             }
             return fields.ToString();
+        }
+
+
+        public string GetTamplate(string path)
+        {
+            if (path.StartsWith("http"))
+            {
+                var client = new HttpClient();
+                var request = new HttpRequestMessage(HttpMethod.Get, path);
+                var response = client.SendAsync(request).Result;
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    return response.Content.ReadAsStringAsync().Result;
+                }
+                else
+                {
+                    throw new ApplicationException("获取模版失败");
+                }
+            }
+            else
+            {
+                return File.ReadAllText(path, Encoding.UTF8);
+            }
         }
 
         Dictionary<string, string> _typeMap;
