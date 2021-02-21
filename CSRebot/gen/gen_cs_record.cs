@@ -5,7 +5,7 @@ namespace ${DataBaseName}
     /// <summary>
     /// ${TableDescribe}
     /// </summary>
-    public class ${TableName}
+    public record ${TableName}
     {
         ${Fields}
         /// <summary>
