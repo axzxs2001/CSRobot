@@ -5,7 +5,12 @@ VisualStudioVersion = 16.0.30914.41
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSRebot", "CSRebot\CSRebot.csproj", "{8832B253-63AE-4B74-A653-ADD0D164CDEE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sample", "Sample\Sample.csproj", "{5D6AC7F5-0A8F-447D-BB27-96F9374728EA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample", "Sample\Sample.csproj", "{5D6AC7F5-0A8F-447D-BB27-96F9374728EA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "gen", "gen", "{DD13421A-0496-4581-9869-9265E34DF7CB}"
+	ProjectSection(SolutionItems) = preProject
+		gen\gen_cs_record..cs = gen\gen_cs_record..cs
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

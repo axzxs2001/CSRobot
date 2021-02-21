@@ -75,7 +75,7 @@ Usage:
             //csrebot gen -dbtype=mysql -to=cs -out=c:/abc
             var options = GetOptions(args);
             ITraverser traverser = null;
-            ILanguageBuilder builder = null;
+            IBuilder builder = null;
             switch (options["-dbtype"].ToLower())
             {
                 case "mysql":

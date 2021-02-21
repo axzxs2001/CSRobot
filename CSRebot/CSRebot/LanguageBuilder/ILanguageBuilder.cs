@@ -10,7 +10,7 @@ namespace CSRebot.LanguageBuilder
     /// <summary>
     /// 完成对应编程语言实体类生成
     /// </summary>
-    public interface ILanguageBuilder
+    public interface IBuilder
     {
         void Build(DataBase database, CommandOptions options);
     }
