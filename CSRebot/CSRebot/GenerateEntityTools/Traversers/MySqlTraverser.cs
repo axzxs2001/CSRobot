@@ -61,9 +61,9 @@ namespace CSRebot.GenerateEntityTools.Traversers
         }
 
 
-        void GetFields(DataBase entityDir)
+        void GetFields(DataBase dataBase)
         {
-            foreach (var table in entityDir.Tables)
+            foreach (var table in dataBase.Tables)
             {
                 var sql = @$"select character_maximum_length as fieldsize,column_name as fieldname,data_type as dbtype,column_comment as fielddescribe from information_schema.columns where table_name = '{table.TableName}' ";
                 using (var con = new MySqlConnection(_connectionStringBuilder.ConnectionString))

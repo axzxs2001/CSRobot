@@ -38,6 +38,7 @@ namespace CSRebot.GenerateEntityTools
                     traverser = new MySqlTraverser(options);
                     break;
                 case "mssql":
+                    traverser = new MsSqlTraverser(options);
                     break;
                 case "postgresql":
                     traverser = new PostgreSqlTraverser(options);
@@ -46,7 +47,7 @@ namespace CSRebot.GenerateEntityTools
             switch (options["--to"].ToLower())
             {
                 case "cs":
-                    builder = new CSharpBuilder();
+                    builder = new CSharpBuilder(options["--dbtype"].ToLower());
                     break;
                 case "go":
                     break;

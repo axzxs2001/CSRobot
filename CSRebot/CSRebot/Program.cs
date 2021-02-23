@@ -28,7 +28,9 @@ namespace CSRebot
             //  args = new string[] { "gen", "--dbtype=mysql", "--to=cs", "--tep=https://raw.githubusercontent.com/axzxs2001/CSRebot/main/CSRebot/gen/gen_cs_record.cs", "--table=account",  "--host=127.0.01","--db=testdb","--user=root","--pwd=gsw2021", "--port=3306" };
 
             //postgres
-             args = new string[] { "gen", "--dbtype=postgresql", "--to=cs", "--tep=https://raw.githubusercontent.com/axzxs2001/CSRebot/main/CSRebot/gen/gen_cs_record.cs",  "--host=127.0.01", "--db=stealthdb", "--user=postgres","--pwd=postgres2018" };
+             //args = new string[] { "gen", "--dbtype=postgresql", "--to=cs", "--tep=https://raw.githubusercontent.com/axzxs2001/CSRebot/main/CSRebot/gen/gen_cs_record.cs",  "--host=127.0.01", "--db=stealthdb", "--user=postgres","--pwd=postgres2018" };
+             //mssql
+            args = new string[] { "gen", "--dbtype=mssql", "--to=cs", "--tep=https://raw.githubusercontent.com/axzxs2001/CSRebot/main/CSRebot/gen/gen_cs_record.cs", "--host=127.0.01", "--db=stealthdb", "--user=sa", "--pwd=sa" };
             CSRebotTools.Run(args);
         }
     }
