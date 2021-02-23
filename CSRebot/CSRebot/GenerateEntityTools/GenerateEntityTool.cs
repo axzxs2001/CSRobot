@@ -13,8 +13,9 @@ namespace CSRebot.GenerateEntityTools
         static bool GenHelp()
         {
             Console.WriteLine(@"csrebot gen -h
-
---dbtype  database type,eg:--dbtype=mysql,--dbtype=mssql,--dbtype=postgressql
+--constr  数据库连接字符串
+--dbtype  数据库类型 database type,eg:--dbtype=mysql,--dbtype=mssql,--dbtype=postgressql
+--table   gnerate the entity class of the specified table name
 --to      entity type,eg:--to=cs,--to=json 
 --out     generate entity folder
 --tep     template source,eg:--tep=/usr/abc/,--tep=https://github.com/abc/bcd.cs
@@ -34,11 +35,12 @@ namespace CSRebot.GenerateEntityTools
             switch (options["--dbtype"].ToLower())
             {
                 case "mysql":
-                    traverser = new MySqlTraverser();
+                    traverser = new MySqlTraverser(options);
                     break;
                 case "mssql":
                     break;
                 case "postgresql":
+                    traverser = new PostgreSqlTraverser(options);
                     break;
             }
             switch (options["--to"].ToLower())

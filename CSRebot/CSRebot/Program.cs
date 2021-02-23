@@ -1,18 +1,34 @@
 ﻿using CSRebot.GenerateEntityTools;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Globalization;
 using System.Reflection;
+using System.Resources;
 
 namespace CSRebot
 {
     class Program
     {
+
+        static CultureInfo _culture;
         static void Main(string[] args)
         {
+            //var mgr = new ResourceManager("CSRebot.Resource.gen", Assembly.GetExecutingAssembly());
+            //_culture = CultureInfo.GetCultureInfo("ja");
+            //Console.WriteLine(mgr.GetString("demo", _culture));
+            //Console.WriteLine(mgr.GetString("demo"));
+
             //多语言支持
+            //"--constr=server=127.0.0.1;database=testdb;uid=root;pwd=gsw2021;"
             //args = new string[] { "gen", "-dbtype=mysql", "-to=cs" };
             //csrebot gen -dbtype=mysql -to=cs -out=c:/abc
-            args = new string[] { "gen", "-h", "--dbtype=mysql", "--to=cs", "--tep=https://raw.githubusercontent.com/axzxs2001/CSRebot/main/CSRebot/gen/gen_cs_record.cs" };
+
+            //mysql 
+            //  args = new string[] { "gen", "--dbtype=mysql", "--to=cs", "--tep=https://raw.githubusercontent.com/axzxs2001/CSRebot/main/CSRebot/gen/gen_cs_record.cs", "--table=account",  "--host=127.0.01","--db=testdb","--user=root","--pwd=gsw2021", "--port=3306" };
+
+            //postgres
+             args = new string[] { "gen", "--dbtype=postgresql", "--to=cs", "--tep=https://raw.githubusercontent.com/axzxs2001/CSRebot/main/CSRebot/gen/gen_cs_record.cs",  "--host=127.0.01", "--db=stealthdb", "--user=postgres","--pwd=postgres2018" };
             CSRebotTools.Run(args);
         }
     }

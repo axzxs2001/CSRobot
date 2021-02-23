@@ -19,5 +19,7 @@ namespace CSRebot.GenerateEntityTools.Entity
         public string FieldDescribe { get; set; }
 
         public string DBType { get; set; }
+
+        public long? FieldSize { get; set; }
     }
 }
