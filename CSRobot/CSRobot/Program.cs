@@ -1,4 +1,4 @@
-﻿using CSRebot.GenerateEntityTools;
+﻿using CSRobot.GenerateEntityTools;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,7 +9,7 @@ using System.Reflection;
 using System.Resources;
 using System.Text;
 
-namespace CSRebot
+namespace CSRobot
 {
     class Program
     {
@@ -21,7 +21,7 @@ namespace CSRebot
         static void Main(string[] args)
         {
     
-            //var mgr = new ResourceManager("CSRebot.Resource.gen", Assembly.GetExecutingAssembly());
+            //var mgr = new ResourceManager("CSRobot.Resource.gen", Assembly.GetExecutingAssembly());
             //_culture = CultureInfo.GetCultureInfo("ja");
             //Console.WriteLine(mgr.GetString("demo", _culture));
             //Console.WriteLine(mgr.GetString("demo"));
@@ -29,27 +29,27 @@ namespace CSRebot
             //多语言支持
             //"--constr=server=127.0.0.1;database=testdb;uid=root;pwd=gsw2021;"
             //args = new string[] { "gen", "-dbtype=mysql", "-to=cs" };
-            //csrebot gen -dbtype=mysql -to=cs -out=c:/abc
+            //CSRobot gen -dbtype=mysql -to=cs -out=c:/abc
 
             //mysql 
-            //  args = new string[] { "gen", "--dbtype=mysql", "--to=cs", "--tep=https://raw.githubusercontent.com/axzxs2001/CSRebot/main/CSRebot/gen/gen_cs_record.cs", "--table=account",  "--host=127.0.01","--db=testdb","--user=root","--pwd=gsw2021", "--port=3306" };
+            //  args = new string[] { "gen", "--dbtype=mysql", "--to=cs", "--tep=https://raw.githubusercontent.com/axzxs2001/CSRobot/main/CSRobot/gen/gen_cs_record.cs", "--table=account",  "--host=127.0.01","--db=testdb","--user=root","--pwd=gsw2021", "--port=3306" };
 
             //postgres
-            //args = new string[] { "gen", "--dbtype=postgresql", "--to=cs", "--tep=https://raw.githubusercontent.com/axzxs2001/CSRebot/main/CSRebot/gen/gen_cs_record.cs",  "--host=127.0.01", "--db=stealthdb", "--user=postgres","--pwd=postgres2018" };
+            //args = new string[] { "gen", "--dbtype=postgresql", "--to=cs", "--tep=https://raw.githubusercontent.com/axzxs2001/CSRobot/main/CSRobot/gen/gen_cs_record.cs",  "--host=127.0.01", "--db=stealthdb", "--user=postgres","--pwd=postgres2018" };
             //mssql
-            //args = new string[] { "gen", "--dbtype=mssql", "--to=cs", "--tep=https://raw.githubusercontent.com/axzxs2001/CSRebot/main/CSRebot/gen/gen_cs_record.cs", "--host=127.0.01", "--db=stealthdb", "--user=sa", "--pwd=sa" };
+            //args = new string[] { "gen", "--dbtype=mssql", "--to=cs", "--tep=https://raw.githubusercontent.com/axzxs2001/CSRobot/main/CSRobot/gen/gen_cs_record.cs", "--host=127.0.01", "--db=stealthdb", "--user=sa", "--pwd=sa" };
 
             //appsettings
-            args = new string[] { "gen", "--dbtype=mssql", "--to=cs", "--tep=https://raw.githubusercontent.com/axzxs2001/CSRebot/main/CSRebot/gen/gen_cs_record.cs", "--db=stealthdb", "--user=sa", "--pwd=sa" };
-            CSRebotTools.Run(args);
+            args = new string[] { "gen", "--dbtype=mssql", "--to=cs", "--tep=https://raw.githubusercontent.com/axzxs2001/CSRobot/main/CSRobot/gen/gen_cs_record.cs", "--db=stealthdb", "--user=sa", "--pwd=sa" };
+            CSRobotTools.Run(args);
         }
     }
-    static class CSRebotTools
+    static class CSRobotTools
     {
-        static Dictionary<string, Func<CommandOptions, bool>> _csRebotDic;
-        static CSRebotTools()
+        static Dictionary<string, Func<CommandOptions, bool>> _CSRobotDic;
+        static CSRobotTools()
         {
-            _csRebotDic = new Dictionary<string, Func<CommandOptions, bool>> {
+            _CSRobotDic = new Dictionary<string, Func<CommandOptions, bool>> {
             {"--info", Info},
             {"-h",Help},
             {"gen",GenerateEntityTool.GenerateEntity}
@@ -60,12 +60,12 @@ namespace CSRebot
             var options = GetOptions(args);
             if (args.Length == 0)
             {
-                _csRebotDic["--info"](options);
+                _CSRobotDic["--info"](options);
                 return;
             }
-            if (_csRebotDic.ContainsKey(args[0]))
+            if (_CSRobotDic.ContainsKey(args[0]))
             {
-                _csRebotDic[args[0]](options);
+                _CSRobotDic[args[0]](options);
             }
         }
         static bool Help(CommandOptions options)
@@ -73,7 +73,7 @@ namespace CSRebot
             Console.WriteLine(@$"
 Version {Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion.ToString()}
 
-使用情况: csrebot [options] [command] [command-options] [arguments]
+使用情况: CSRobot [options] [command] [command-options] [arguments]
 
 ");
             return true;
@@ -81,13 +81,13 @@ Version {Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVer
         static bool Info(CommandOptions options)
         {
             Console.WriteLine(@$"
-CSRebot v{Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion.ToString()}
+CSRobot v{Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion.ToString()}
 ----------------------------------------------
 Description:
     为更好的使用C#提供帮助。
 
 Usage:
-    csrebot [options]
+    CSRobot [options]
 
 ----------------------------------------------
 ");
