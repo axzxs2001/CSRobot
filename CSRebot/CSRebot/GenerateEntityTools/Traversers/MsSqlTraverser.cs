@@ -10,26 +10,33 @@ using Microsoft.Data.SqlClient;
 
 namespace CSRebot.GenerateEntityTools.Traversers
 {
-    public class MsSqlTraverser : ITraverser
+    public class MsSqlTraverser : Traverser
     {
 
         SqlConnectionStringBuilder _connectionStringBuilder;
-
-        public MsSqlTraverser(CommandOptions options)
+        public MsSqlTraverser(CommandOptions options) : base(options)
         {
-            //todo 这里可以查询项目配置文件中的appsettings.json或app.config中的连接字符串
-
-            // "--host=127.0.01","--db=testdb","--user=root","--pwd=gsw2021","--port=3069"
-            _connectionStringBuilder = new SqlConnectionStringBuilder()
+            if (IsExistOption)
             {
-                DataSource = options["--host"],
-                InitialCatalog = options["--db"],
-                UserID = options["--user"],
-                Password = options["--pwd"],             
-            };
-         
+                _connectionStringBuilder = new SqlConnectionStringBuilder()
+                {
+                    DataSource = options["--host"],
+                    InitialCatalog = options["--db"],
+                    UserID = options["--user"],
+                    Password = options["--pwd"],
+                };
+            }
+            else
+            {
+                var connectionString = Common.GetConnectionString();
+                if (string.IsNullOrEmpty(connectionString))
+                {
+                    Console.WriteLine("本地配置文件中找不到数据库连接字符串");
+                }
+                _connectionStringBuilder = new SqlConnectionStringBuilder(connectionString);
+            }
         }
-        public DataBase Traverse()
+        public override DataBase Traverse()
         {
             return GetDataBase();
         }
@@ -92,6 +99,10 @@ where   d.name='{table.TableName}'
                 }
             }
         }
+
+
+
+
 
     }
 

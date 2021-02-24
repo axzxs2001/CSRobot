@@ -1,6 +1,7 @@
 ﻿
 
 using CSRebot.GenerateEntityTools.Entity;
+using System;
 
 namespace CSRebot.GenerateEntityTools.Traversers
 {
@@ -11,4 +12,6 @@ namespace CSRebot.GenerateEntityTools.Traversers
     {
         DataBase Traverse();
     }
+
+
 }

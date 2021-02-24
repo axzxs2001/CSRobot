@@ -3,17 +3,24 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Resources;
+using System.Text;
 
 namespace CSRebot
 {
     class Program
     {
 
+    
+
+
         static CultureInfo _culture;
         static void Main(string[] args)
         {
+    
             //var mgr = new ResourceManager("CSRebot.Resource.gen", Assembly.GetExecutingAssembly());
             //_culture = CultureInfo.GetCultureInfo("ja");
             //Console.WriteLine(mgr.GetString("demo", _culture));
@@ -28,9 +35,12 @@ namespace CSRebot
             //  args = new string[] { "gen", "--dbtype=mysql", "--to=cs", "--tep=https://raw.githubusercontent.com/axzxs2001/CSRebot/main/CSRebot/gen/gen_cs_record.cs", "--table=account",  "--host=127.0.01","--db=testdb","--user=root","--pwd=gsw2021", "--port=3306" };
 
             //postgres
-             //args = new string[] { "gen", "--dbtype=postgresql", "--to=cs", "--tep=https://raw.githubusercontent.com/axzxs2001/CSRebot/main/CSRebot/gen/gen_cs_record.cs",  "--host=127.0.01", "--db=stealthdb", "--user=postgres","--pwd=postgres2018" };
-             //mssql
-            args = new string[] { "gen", "--dbtype=mssql", "--to=cs", "--tep=https://raw.githubusercontent.com/axzxs2001/CSRebot/main/CSRebot/gen/gen_cs_record.cs", "--host=127.0.01", "--db=stealthdb", "--user=sa", "--pwd=sa" };
+            //args = new string[] { "gen", "--dbtype=postgresql", "--to=cs", "--tep=https://raw.githubusercontent.com/axzxs2001/CSRebot/main/CSRebot/gen/gen_cs_record.cs",  "--host=127.0.01", "--db=stealthdb", "--user=postgres","--pwd=postgres2018" };
+            //mssql
+            //args = new string[] { "gen", "--dbtype=mssql", "--to=cs", "--tep=https://raw.githubusercontent.com/axzxs2001/CSRebot/main/CSRebot/gen/gen_cs_record.cs", "--host=127.0.01", "--db=stealthdb", "--user=sa", "--pwd=sa" };
+
+            //appsettings
+            args = new string[] { "gen", "--dbtype=mssql", "--to=cs", "--tep=https://raw.githubusercontent.com/axzxs2001/CSRebot/main/CSRebot/gen/gen_cs_record.cs", "--db=stealthdb", "--user=sa", "--pwd=sa" };
             CSRebotTools.Run(args);
         }
     }

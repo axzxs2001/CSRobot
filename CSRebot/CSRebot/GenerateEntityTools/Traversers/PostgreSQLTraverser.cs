@@ -12,24 +12,36 @@ using Npgsql;
 
 namespace CSRebot.GenerateEntityTools.Traversers
 {
-    public class PostgreSqlTraverser : ITraverser
+    public class PostgreSqlTraverser : Traverser
     {
 
         NpgsqlConnectionStringBuilder _connectionStringBuilder;
 
-        public PostgreSqlTraverser(CommandOptions options)
+        public PostgreSqlTraverser(CommandOptions options) : base(options)
         {
-            //todo 这里可以查询项目配置文件中的appsettings.json或app.config中的连接字符串
-            _connectionStringBuilder = new NpgsqlConnectionStringBuilder()
+            if (IsExistOption)
             {
-                Host = options["--host"],
-                Database = options["--db"],
-                Username = options["--user"],
-                Password = options["--pwd"],
-                Port = options.ContainsKey("--port") ? int.Parse(options["--port"]) : 5432,
-            };
+                _connectionStringBuilder = new NpgsqlConnectionStringBuilder()
+                {
+                    Host = options["--host"],
+                    Database = options["--db"],
+                    Username = options["--user"],
+                    Password = options["--pwd"],
+                    Port = options.ContainsKey("--port") ? int.Parse(options["--port"]) : 5432,
+                };
+            }
+            else
+            {
+                var connectionString = Common.GetConnectionString();
+                if (string.IsNullOrEmpty(connectionString))
+                {
+                    Console.WriteLine("本地配置文件中找不到数据库连接字符串");
+                }
+                _connectionStringBuilder = new NpgsqlConnectionStringBuilder(connectionString);
+                Console.WriteLine("从本地配置文件中加载连接字符中成功");
+            }
         }
-        public DataBase Traverse()
+        public override DataBase Traverse()
         {
             return GetDataBase();
         }

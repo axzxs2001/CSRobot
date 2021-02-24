@@ -11,26 +11,35 @@ using MySql.Data.MySqlClient;
 
 namespace CSRebot.GenerateEntityTools.Traversers
 {
-    public class MySqlTraverser : ITraverser
+    public class MySqlTraverser : Traverser
     {
 
         MySqlConnectionStringBuilder _connectionStringBuilder;
 
-        public MySqlTraverser(CommandOptions options)
+        public MySqlTraverser(CommandOptions options) : base(options)
         {
-            //todo 这里可以查询项目配置文件中的appsettings.json或app.config中的连接字符串
-
-            // "--host=127.0.01","--db=testdb","--user=root","--pwd=gsw2021","--port=3069"
-            _connectionStringBuilder = new MySqlConnectionStringBuilder()
+            if (IsExistOption)
             {
-                Server = options["--host"],
-                Database = options["--db"],
-                UserID = options["--user"],
-                Password = options["--pwd"],
-                Port = options.ContainsKey("--port") ? uint.Parse(options["--port"]) : 3306,
-            };
+                _connectionStringBuilder = new MySqlConnectionStringBuilder()
+                {
+                    Server = options["--host"],
+                    Database = options["--db"],
+                    UserID = options["--user"],
+                    Password = options["--pwd"],
+                    Port = options.ContainsKey("--port") ? uint.Parse(options["--port"]) : 3306,
+                };
+            }
+            else
+            {
+                var connectionString = Common.GetConnectionString();
+                if (string.IsNullOrEmpty(connectionString))
+                {
+                    Console.WriteLine("本地配置文件中找不到数据库连接字符串");
+                }
+                _connectionStringBuilder = new MySqlConnectionStringBuilder(connectionString);
+            }
         }
-        public DataBase Traverse()
+        public override DataBase Traverse()
         {
             return GetDataBase();
         }
@@ -80,7 +89,7 @@ namespace CSRebot.GenerateEntityTools.Traversers
                         var size = reader.GetFieldValue<object>("fieldsize");
                         if (size != DBNull.Value)
                         {
-                            field.FieldSize =Convert.ToInt64(size);
+                            field.FieldSize = Convert.ToInt64(size);
                         }
                         table.Fields.Add(field);
                     }
