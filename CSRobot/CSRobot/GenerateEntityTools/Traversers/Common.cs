@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CSRebot.GenerateEntityTools.Traversers
+namespace CSRobot.GenerateEntityTools.Traversers
 {
     static class Common
     {

@@ -1,7 +1,7 @@
-﻿using CSRebot.GenerateEntityTools.Entity;
+﻿using CSRobot.GenerateEntityTools.Entity;
 using System;
 
-namespace CSRebot.GenerateEntityTools.Traversers
+namespace CSRobot.GenerateEntityTools.Traversers
 {
     public abstract class Traverser : ITraverser
     {

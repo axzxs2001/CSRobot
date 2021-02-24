@@ -1,5 +1,5 @@
 ﻿
-using CSRebot.GenerateEntityTools.Entity;
+using CSRobot.GenerateEntityTools.Entity;
 using Org.BouncyCastle.Crypto.Modes.Gcm;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CSRebot.GenerateEntityTools.Builders
+namespace CSRobot.GenerateEntityTools.Builders
 {
 
     public class CSharpBuilder : IBuilder

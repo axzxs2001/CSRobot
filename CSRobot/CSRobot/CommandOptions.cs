@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CSRebot
+namespace CSRobot
 {
     public class CommandOptions : Dictionary<string, string>
     {

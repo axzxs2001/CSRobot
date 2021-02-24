@@ -5,11 +5,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CSRebot.GenerateEntityTools.Entity;
+using CSRobot.GenerateEntityTools.Entity;
 using MySql.Data;
 using MySql.Data.MySqlClient;
 
-namespace CSRebot.GenerateEntityTools.Traversers
+namespace CSRobot.GenerateEntityTools.Traversers
 {
     public class MySqlTraverser : Traverser
     {

@@ -6,7 +6,7 @@
 		<Version>0.0.1</Version>
 
 		<PackAsTool>true</PackAsTool>
-		<ToolCommandName>csrebot</ToolCommandName>
+		<ToolCommandName>CSRobot</ToolCommandName>
 		<PackageOutputPath>./nupkg</PackageOutputPath>
 	</PropertyGroup>
 

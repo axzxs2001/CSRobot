@@ -1,12 +1,12 @@
 ﻿
-using CSRebot.GenerateEntityTools.Entity;
+using CSRobot.GenerateEntityTools.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CSRebot.GenerateEntityTools.Builders
+namespace CSRobot.GenerateEntityTools.Builders
 {
     /// <summary>
     /// 完成对应编程语言实体类生成

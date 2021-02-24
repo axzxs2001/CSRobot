@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CSRebot.GenerateEntityTools.Traversers;
-using CSRebot.GenerateEntityTools.Builders;
-namespace CSRebot.GenerateEntityTools
+using CSRobot.GenerateEntityTools.Traversers;
+using CSRobot.GenerateEntityTools.Builders;
+namespace CSRobot.GenerateEntityTools
 {
     static class GenerateEntityTool
     {
         //todo 这里要实现多语言支持
         static bool GenHelp()
         {
-            Console.WriteLine(@"csrebot gen -h
+            Console.WriteLine(@"CSRobot gen -h
 --constr  数据库连接字符串
 --dbtype  数据库类型 database type,eg:--dbtype=mysql,--dbtype=mssql,--dbtype=postgressql
 --table   gnerate the entity class of the specified table name
