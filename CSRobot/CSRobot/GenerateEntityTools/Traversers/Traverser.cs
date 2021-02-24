@@ -5,7 +5,7 @@ namespace CSRobot.GenerateEntityTools.Traversers
 {
     public abstract class Traverser : ITraverser
     {
-        protected bool IsExistOption { get; set; }
+        protected bool IsExistOption { get; set; } = true;
         public Traverser(CommandOptions options)
         {
             if (!options.ContainsKey("--host"))

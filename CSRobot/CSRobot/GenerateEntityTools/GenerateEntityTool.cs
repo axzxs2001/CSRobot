@@ -5,6 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using CSRobot.GenerateEntityTools.Traversers;
 using CSRobot.GenerateEntityTools.Builders;
+using System.Resources;
+using System.Reflection;
+
 namespace CSRobot.GenerateEntityTools
 {
     static class GenerateEntityTool
@@ -12,14 +15,9 @@ namespace CSRobot.GenerateEntityTools
         //todo 这里要实现多语言支持
         static bool GenHelp()
         {
-            Console.WriteLine(@"CSRobot gen -h
---constr  数据库连接字符串
---dbtype  数据库类型 database type,eg:--dbtype=mysql,--dbtype=mssql,--dbtype=postgressql
---table   gnerate the entity class of the specified table name
---to      entity type,eg:--to=cs,--to=json 
---out     generate entity folder
---tep     template source,eg:--tep=/usr/abc/,--tep=https://github.com/abc/bcd.cs
-");
+            var mgr = new ResourceManager("CSRobot.Resource.gen", Assembly.GetExecutingAssembly());
+            // _culture = CultureInfo.GetCultureInfo("ja");
+            Console.WriteLine(mgr.GetString("gen-h"));
             return true;
         }
         internal static bool GenerateEntity(CommandOptions options)
@@ -32,25 +30,40 @@ namespace CSRobot.GenerateEntityTools
 
             ITraverser traverser = null;
             IBuilder builder = null;
-            switch (options["--dbtype"].ToLower())
+            if (options.ContainsKey("--dbtype"))
             {
-                case "mysql":
-                    traverser = new MySqlTraverser(options);
-                    break;
-                case "mssql":
-                    traverser = new MsSqlTraverser(options);
-                    break;
-                case "postgresql":
-                    traverser = new PostgreSqlTraverser(options);
-                    break;
+                switch (options["--dbtype"].ToLower())
+                {
+                    case "mysql":
+                        traverser = new MySqlTraverser(options);
+                        break;
+                    case "mssql":
+                        traverser = new MsSqlTraverser(options);
+                        break;
+                    case "postgresql":
+                        traverser = new PostgreSqlTraverser(options);
+                        break;
+                }
             }
-            switch (options["--to"].ToLower())
+            else
             {
-                case "cs":
-                    builder = new CSharpBuilder(options["--dbtype"].ToLower());
-                    break;
-                case "go":
-                    break;
+                Console.WriteLine("--dbtype是必填参数");
+                return false;
+            }
+            if (options.ContainsKey("--to"))
+            {
+                switch (options["--to"].ToLower())
+                {
+                    case "cs":
+                        builder = new CSharpBuilder(options["--dbtype"].ToLower());
+                        break;
+                    case "go":
+                        break;
+                }
+            }
+            else
+            {
+                builder = new CSharpBuilder(options["--dbtype"].ToLower());
             }
             if (traverser != null && builder != null)
             {

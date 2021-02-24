@@ -117,7 +117,47 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="csrobot-h" xml:space="preserve">
+    <value>CSRobot Version {0}
+
+使用情况: CSRobot [options] [command] [command-options] [arguments]
+
+------------------------------------------------
+命令：
+csrobot gen
+
+选项参数：
+csrobot -info
+csrobot -h</value>
+  </data>
+  <data name="csrobot-info" xml:space="preserve">
+    <value>CSRobot v{0}
+----------------------------------------------
+Description:
+    为更好的使用C#提供帮助。
+
+Usage:
+    CSRobot [options] [command] [command-options] [arguments]
+
+----------------------------------------------</value>
+  </data>
   <data name="demo" xml:space="preserve">
     <value>你好</value>
+  </data>
+  <data name="gen-h" xml:space="preserve">
+    <value>使用方法：
+csrobot gen [options]
+
+命令参数选项：
+--dbtype        数据库类型，必填，例如:--dbtype=mysql,--dbtype=mssql,--dbtype=postgressql
+--table         指定数据库表名生成实体类，缺省默认全部库表
+--to            生成实体的类型，缺省默认cs，例如:--to=cs
+--out           生成实体类的路径，缺省默认当前路径
+--tep           生成实体类的模版，可以指定本地或url，缺省默认-to指定类型的内部模块，例如:--tep=/usr/abc/bcd.cs,--tep=https://github.com/abc/bcd.cs
+--host          连接数据所在主机，如果缺少此项，会查找当前目录或子目录中的是否存在appsettings.json配置文件，并取配置文件下的ConnectionStrings节点的第一个子节点的值作为连接字符串
+--db            数据库名称，，如果缺少此项，会查找当前目录或子目录中的是否存在appsettings.json配置文件，并取配置文件下的ConnectionStrings节点的第一个子节点的值作为连接字符串
+--user          数据库用户名，如果缺少此项，会查找当前目录或子目录中的是否存在appsettings.json配置文件，并取配置文件下的ConnectionStrings节点的第一个子节点的值作为连接字符串
+--pwd           数据库密码，如果缺少此项，会查找当前目录或子目录中的是否存在appsettings.json配置文件，并取配置文件下的ConnectionStrings节点的第一个子节点的值作为连接字符串
+--port          数据库端口号，如果缺少此项，会查找当前目录或子目录中的是否存在appsettings.json配置文件，并取配置文件下的ConnectionStrings节点的第一个子节点的值作为连接字符串</value>
   </data>
 </root>

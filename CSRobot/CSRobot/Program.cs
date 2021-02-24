@@ -13,14 +13,8 @@ namespace CSRobot
 {
     class Program
     {
-
-    
-
-
-        static CultureInfo _culture;
         static void Main(string[] args)
         {
-    
             //var mgr = new ResourceManager("CSRobot.Resource.gen", Assembly.GetExecutingAssembly());
             //_culture = CultureInfo.GetCultureInfo("ja");
             //Console.WriteLine(mgr.GetString("demo", _culture));
@@ -37,11 +31,20 @@ namespace CSRobot
             //postgres
             //args = new string[] { "gen", "--dbtype=postgresql", "--to=cs", "--tep=https://raw.githubusercontent.com/axzxs2001/CSRobot/main/CSRobot/gen/gen_cs_record.cs",  "--host=127.0.01", "--db=stealthdb", "--user=postgres","--pwd=postgres2018" };
             //mssql
-            //args = new string[] { "gen", "--dbtype=mssql", "--to=cs", "--tep=https://raw.githubusercontent.com/axzxs2001/CSRobot/main/CSRobot/gen/gen_cs_record.cs", "--host=127.0.01", "--db=stealthdb", "--user=sa", "--pwd=sa" };
-
+            args = new string[] { "gen", "--dbtype=mssql", "--host=127.0.0.1", "--db=stealthdb", "--user=sa", "--pwd=sa" };
             //appsettings
-            args = new string[] { "gen", "--dbtype=mssql", "--to=cs", "--tep=https://raw.githubusercontent.com/axzxs2001/CSRobot/main/CSRobot/gen/gen_cs_record.cs", "--db=stealthdb", "--user=sa", "--pwd=sa" };
-            CSRobotTools.Run(args);
+            // args = new string[] { "gen", "--dbtype=mssql", "--to=cs", "--tep=https://raw.githubusercontent.com/axzxs2001/CSRobot/main/CSRobot/gen/gen_cs_record.cs", "--db=stealthdb", "--user=sa", "--pwd=sa" };
+
+            // args = new string[] { "gen", "-h" };
+            // args = new string[] { "-info" };
+            try
+            {
+                CSRobotTools.Run(args);
+            }
+            catch (Exception exc)
+            {
+                Console.WriteLine(exc.Message);
+            }
         }
     }
     static class CSRobotTools
@@ -50,7 +53,7 @@ namespace CSRobot
         static CSRobotTools()
         {
             _CSRobotDic = new Dictionary<string, Func<CommandOptions, bool>> {
-            {"--info", Info},
+            {"-info", Info},
             {"-h",Help},
             {"gen",GenerateEntityTool.GenerateEntity}
         };
@@ -70,27 +73,14 @@ namespace CSRobot
         }
         static bool Help(CommandOptions options)
         {
-            Console.WriteLine(@$"
-Version {Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion.ToString()}
-
-使用情况: CSRobot [options] [command] [command-options] [arguments]
-
-");
+            var mgr = new ResourceManager("CSRobot.Resource.gen", Assembly.GetExecutingAssembly());
+            Console.WriteLine(mgr.GetString("csrobot-h"), Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion.ToString());
             return true;
         }
         static bool Info(CommandOptions options)
         {
-            Console.WriteLine(@$"
-CSRobot v{Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion.ToString()}
-----------------------------------------------
-Description:
-    为更好的使用C#提供帮助。
-
-Usage:
-    CSRobot [options]
-
-----------------------------------------------
-");
+            var mgr = new ResourceManager("CSRobot.Resource.gen", Assembly.GetExecutingAssembly());
+            Console.WriteLine(mgr.GetString("csrobot-info"), Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion.ToString());
             return true;
         }
         static CommandOptions GetOptions(string[] args)
@@ -98,6 +88,10 @@ Usage:
             var options = new CommandOptions();
             for (var i = 1; i < args.Length; i++)
             {
+                if (string.IsNullOrEmpty(args[i].Trim()))
+                {
+                    continue;
+                }
                 var arr = args[i].Split("=");
                 if (arr.Length < 2)
                 {

@@ -3,11 +3,20 @@
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 		<TargetFramework>net5.0</TargetFramework>
-		<Version>0.0.1</Version>
+		<Version>0.0.3</Version>
 
 		<PackAsTool>true</PackAsTool>
 		<ToolCommandName>CSRobot</ToolCommandName>
 		<PackageOutputPath>./nupkg</PackageOutputPath>
+		<RepositoryUrl>https://github.com/axzxs2001/CSRobot</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageTags>csrobot</PackageTags>
+		<Authors>guisuwei</Authors>
+		<Description>Help you generate code efficiently.</Description>
+		<PackageIcon>csrobot.png</PackageIcon>
+		<AssemblyVersion>0.0.3.0</AssemblyVersion>
+		<PackageProjectUrl>https://github.com/axzxs2001/CSRobot</PackageProjectUrl>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -33,6 +42,17 @@
 
 	<ItemGroup>
 	  <Folder Include="nupkg\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="..\..\..\..\..\..\Users\Guisuwei\Desktop\素材\csrobot.png">
+	    <Pack>True</Pack>
+	    <PackagePath></PackagePath>
+	  </None>
+	  <None Include="..\..\LICENSE">
+	    <Pack>True</Pack>
+	    <PackagePath></PackagePath>
+	  </None>
 	</ItemGroup>
 
 </Project>

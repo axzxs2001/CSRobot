@@ -23,7 +23,7 @@ namespace CSRobot.GenerateEntityTools.Traversers
                     DataSource = options["--host"],
                     InitialCatalog = options["--db"],
                     UserID = options["--user"],
-                    Password = options["--pwd"],
+                    Password = options["--pwd"],                   
                 };
             }
             else

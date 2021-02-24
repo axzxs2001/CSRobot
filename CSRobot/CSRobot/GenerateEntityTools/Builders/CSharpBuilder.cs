@@ -8,7 +8,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace CSRobot.GenerateEntityTools.Builders
 {
@@ -19,7 +18,7 @@ namespace CSRobot.GenerateEntityTools.Builders
         {
             //取模版
             var template = "";
-            if (!string.IsNullOrEmpty(options["--tep"]))
+            if (options.ContainsKey("--tep"))
             {
                 template = GetTamplate(options["--tep"]);
             }
