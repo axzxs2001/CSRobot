@@ -68,10 +68,12 @@ namespace CSRobot.GenerateEntityTools
             if (traverser != null && builder != null)
             {
                 builder.Build(traverser.Traverse(), options);
+                Console.WriteLine("生成成功");
                 return true;
             }
             else
             {
+                Console.WriteLine("生成失败");
                 return false;
             }
         }

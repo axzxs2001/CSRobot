@@ -1,5 +1,6 @@
 ﻿
 using CSRobot.GenerateEntityTools.Entity;
+using Npgsql.TypeHandlers.GeometricHandlers;
 using Org.BouncyCastle.Crypto.Modes.Gcm;
 using System;
 using System.Collections.Generic;
@@ -16,31 +17,18 @@ namespace CSRobot.GenerateEntityTools.Builders
     {
         public void Build(DataBase database, CommandOptions options)
         {
-            //取模版
-            var template = "";
-            if (options.ContainsKey("--tep"))
-            {
-                template = GetTamplate(options["--tep"]);
-            }
             //取输出路径
-            var basePath = "";
-            if (options.ContainsKey("--out"))
-            {
-                basePath = options["--out"];
-            }
-            else
-            {
-                basePath = $"{Directory.GetCurrentDirectory()}/{database.DataBaseName}";
-                Directory.CreateDirectory(basePath);
-            }
+            var basePath = GetOut(options, database.DataBaseName);
+
+            var template = GetTamplate(options);
             //生成独立的表
             if (options.ContainsKey("--table"))
             {
                 var table = database.Tables.SingleOrDefault(s => s.TableName == options["--table"]);
                 if (table != null)
                 {
-                    var codeString = GetCodeString(database.DataBaseName, table, template);
-                    File.WriteAllText($"{basePath}/{table.TableName}.cs", codeString.ToString(), Encoding.UTF8);
+                    var codeString = GetCodeString(database.DataBaseName, table, template.Template);
+                    File.WriteAllText($"{basePath}/{table.TableName}{template.Extension}", codeString.ToString(), Encoding.UTF8);
                 }
                 else
                 {
@@ -52,37 +40,14 @@ namespace CSRobot.GenerateEntityTools.Builders
                 //生成所有表实体类
                 foreach (var table in database.Tables)
                 {
-                    var codeString = GetCodeString(database.DataBaseName, table, template);
-                    File.WriteAllText($"{basePath}/{table.TableName}.cs", codeString.ToString(), Encoding.UTF8);
+                    var codeString = GetCodeString(database.DataBaseName, table, template.Template);
+                    File.WriteAllText($"{basePath}/{table.TableName}{template.Extension}", codeString.ToString(), Encoding.UTF8);
                 }
             }
         }
 
-        private string GetCodeString(string dataBaseName, Table table, string template = null)
+        private string GetCodeString(string dataBaseName, Table table, string template)
         {
-            if (string.IsNullOrEmpty(template))
-            {
-                template = @"
-using System;
-
-namespace ${DataBaseName}
-{
-    /// <summary>
-    /// ${TableDescribe}
-    /// </summary>
-    public class ${TableName}
-    {
-        ${Fields}
-        /// <summary>
-        /// ${FieldDescribe}
-        /// </summary>
-        public ${DBType} ${FieldName}
-        { get; set; }
-        ${Fields}
-    }
-}
-";
-            }
             template = template.Replace("${DataBaseName}", dataBaseName);
             template = template.Replace("${TableDescribe}", table.TableDescribe);
             template = template.Replace("${TableName}", table.TableName);
@@ -97,7 +62,7 @@ namespace ${DataBaseName}
             return string.Join("", templateArr);
         }
 
-        private string GetFieldString(Table table, string fieldTamplate)
+        private string GetFieldString1(Table table, string fieldTamplate)
         {
             var fields = new StringBuilder();
 
@@ -107,31 +72,128 @@ namespace ${DataBaseName}
                 fieldTamplateValue = fieldTamplateValue.Replace("${FieldDescribe}", field.FieldDescribe);
                 fieldTamplateValue = fieldTamplateValue.Replace("${DBType}", _typeMap[field.DBType]);
                 fieldTamplateValue = fieldTamplateValue.Replace("${FieldName}", field.FieldName);
+                if (field.FieldSize.HasValue)
+                {
+                    fieldTamplateValue = fieldTamplateValue.Replace("${FieldSize}", field.FieldSize.Value.ToString());
+                }
                 fields.Append(fieldTamplateValue);
             }
             return fields.ToString();
         }
 
-
-        public string GetTamplate(string path)
+        private string GetFieldString(Table table, string fieldTamplate)
         {
-            if (path.StartsWith("http"))
+            var fields = new StringBuilder();
+
+            foreach (var field in table.Fields)
             {
-                var client = new HttpClient();
-                var request = new HttpRequestMessage(HttpMethod.Get, path);
-                var response = client.SendAsync(request).Result;
-                if (response.StatusCode == HttpStatusCode.OK)
+                var lines = fieldTamplate.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var line in lines)
                 {
-                    return response.Content.ReadAsStringAsync().Result;
+                    var newLine = line;
+
+                    if (newLine.Trim().StartsWith("$?"))
+                    {
+                        if (field.FieldSize.HasValue)
+                        {
+                            newLine = newLine.Replace("${FieldSize}", field.FieldSize.Value.ToString()).Replace("$?","");
+                            fields.AppendLine(newLine);
+                        }
+                        //if(!string.IsNullOrEmpty(field.FieldDescribe))
+                        //{
+                        //    newLine = newLine.Replace("${FieldDescribe}", field.FieldDescribe).Replace("$?", "");                     
+                        //}
+                        //if (!string.IsNullOrEmpty(_typeMap[field.DBType]))
+                        //{                          
+                        //    newLine = newLine.Replace("${DBType}", _typeMap[field.DBType]).Replace("$?", "");                        
+                        //}
+                        //if (!string.IsNullOrEmpty(field.FieldName))
+                        //{                   
+                        //    newLine = newLine.Replace("${FieldName}", field.FieldName).Replace("$?", "");
+                        //}
+                    }
+                    else
+                    {
+                        newLine = newLine.Replace("${FieldDescribe}", field.FieldDescribe);
+                        newLine = newLine.Replace("${DBType}", _typeMap[field.DBType]);
+                        newLine = newLine.Replace("${FieldName}", field.FieldName);
+                        if (field.FieldSize.HasValue)
+                        {
+                            newLine = newLine.Replace("${FieldSize}", field.FieldSize.Value.ToString());
+                        }
+                        fields.AppendLine(newLine);
+                    }
+                }
+            }
+            return fields.ToString();
+        }
+        private string GetOut(CommandOptions options, string dataBaseName)
+        {
+            if (options.ContainsKey("--out"))
+            {
+                return options["--out"];
+            }
+            else
+            {
+                var basePath = $"{Directory.GetCurrentDirectory()}/{dataBaseName}";
+                Directory.CreateDirectory(basePath);
+                return basePath;
+            }
+        }
+        private (string Template, string Extension) GetTamplate(CommandOptions options)
+        {
+            var template = @"
+using System;
+
+namespace ${DataBaseName}
+{
+    /// <summary>
+    /// ${TableDescribe}
+    /// </summary>
+    public class ${TableName}
+    {
+        ${Fields}
+        /// <summary>
+        /// ${FieldDescribe}
+        /// </summary>
+        $?[BField(Length=${FieldSize})]
+        public ${DBType} ${FieldName}
+        { get; set; }
+        ${Fields}
+    }
+}
+";
+            if (options.ContainsKey("--tep"))
+            {
+                var path = options["--tep"].ToLower();
+                if (path == "cs")
+                {
+                    return (template, ".cs");
+                }
+
+                if (path.StartsWith("http"))
+                {
+                    var client = new HttpClient();
+                    var request = new HttpRequestMessage(HttpMethod.Get, path);
+                    var response = client.SendAsync(request).Result;
+                    if (response.StatusCode == HttpStatusCode.OK)
+                    {
+
+                        return (response.Content.ReadAsStringAsync().Result, Path.GetExtension(path));
+                    }
+                    else
+                    {
+                        throw new ApplicationException("获取模版失败");
+                    }
                 }
                 else
                 {
-                    throw new ApplicationException("获取模版失败");
+                    return (File.ReadAllText(path, Encoding.UTF8), Path.GetExtension(path));
                 }
             }
             else
             {
-                return File.ReadAllText(path, Encoding.UTF8);
+                return (template, ".cs");
             }
         }
 

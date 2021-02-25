@@ -71,12 +71,12 @@ namespace CSRobot.GenerateEntityTools.Traversers
         {
             foreach (var table in dataBase.Tables)
             {
-                var sql = @$"SELECT   a.name as fieldname,b.name as dbtype,COLUMNPROPERTY(a.id,a.name,'PRECISION') as fieldsize,isnull(g.[value],'') as fielddescribe
+                var sql = @$"SELECT  a.name as fieldname,b.name as dbtype,case when a.xprec=0 then COLUMNPROPERTY(a.id,a.name,'PRECISION') else null end as fieldsize,isnull(g.[value],'') as fielddescribe
 FROM  syscolumns a
 left join     systypes b on     a.xusertype=b.xusertype
 inner join     sysobjects d on     a.id=d.id  and d.xtype='U' and  d.name<>'dtproperties'
 left join sys.extended_properties   g on     a.id=G.major_id and a.colid=g.minor_id 
-where   d.name='{table.TableName}'    
+where  d.name='{table.TableName}'    
 ";
                 using (var con = new SqlConnection(_connectionStringBuilder.ConnectionString))
                 {

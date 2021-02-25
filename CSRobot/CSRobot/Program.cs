@@ -58,17 +58,20 @@ namespace CSRobot
             {"gen",GenerateEntityTool.GenerateEntity}
         };
         }
-        public static void Run(string[] args)
+        public static bool Run(string[] args)
         {
             var options = GetOptions(args);
             if (args.Length == 0)
             {
-                _CSRobotDic["--info"](options);
-                return;
+                return _CSRobotDic["--info"](options);
             }
-            if (_CSRobotDic.ContainsKey(args[0]))
+            else if (_CSRobotDic.ContainsKey(args[0]))
             {
-                _CSRobotDic[args[0]](options);
+                return _CSRobotDic[args[0]](options);
+            }
+            else
+            {
+                return false;
             }
         }
         static bool Help(CommandOptions options)
