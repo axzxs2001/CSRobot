@@ -3,10 +3,9 @@
 <img src="https://github.com/axzxs2001/CSRobot/blob/main/csrobot.png" width="120"/>
 
 > gen --dbtype=mssql --to=cs --tep=https://raw.githubusercontent.com/axzxs2001/CSRebot/main/CSRebot/gen/gen_cs_record.cs --host=127.0.0.1 --db=stealthdb --user=sa --pwd=sa
-  csrobot gen [options]
-命令参数选项：
-
-| option      | 描述     |
+ 
+ csrobot gen [options]
+| 参数选项      | 描述     |
 | ---------- | :-----------:  | 
 |--dbtype	|数据库类型，必填，例如:--dbtype=mysql,--dbtype=mssql,--dbtype=postgressql|
 |--table	|指定数据库表名生成实体类，缺省默认全部库表|
