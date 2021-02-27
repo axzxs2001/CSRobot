@@ -2,7 +2,13 @@
 
 <img src="https://github.com/axzxs2001/CSRobot/blob/main/csrobot.png" width="120"/>
 
-> gen --dbtype=mssql --to=cs --tep=https://raw.githubusercontent.com/axzxs2001/CSRebot/main/CSRebot/gen/gen_cs_record.cs --host=127.0.0.1 --db=stealthdb --user=sa --pwd=sa
+Nuget地址：
+>https://www.nuget.org/packages/CSRobot/
+安装命令：
+>dotnet tool install --global CSRobot --version 0.0.3
+
+
+>csrobot gen --dbtype=mssql --to=cs --tep=https://raw.githubusercontent.com/axzxs2001/CSRebot/main/CSRebot/gen/gen_cs_record.cs --host=127.0.0.1 --db=stealthdb --user=sa --pwd=sa
  
 ### csrobot gen [options]
 |参数选项|描述|
