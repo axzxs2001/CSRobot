@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace CSRobot.GenerateEntityTools.Builders
 {
@@ -58,7 +59,7 @@ namespace CSRobot.GenerateEntityTools.Builders
         }
         /// <summary>
         /// 模板替换
-        /// </summary>
+        /// </summary>d
         /// <param name="dataBaseName"></param>
         /// <param name="table"></param>
         /// <param name="template"></param>
@@ -69,15 +70,13 @@ namespace CSRobot.GenerateEntityTools.Builders
             template = template.Replace("${TableDescribe}", table.TableDescribe);
             template = template.Replace("${TableName}", table.TableName);
 
-            //fields循环
-            var templateArr = template.Split("${Fields}");
-            if (templateArr.Length < 3)
+            var match = Regex.Match(template, @"(?<=\$\{Fields\})[\w\W]+(?=\$\{Fields\})");
+            if (match.Success)
             {
-                throw new ApplicationException("请检查${Fields}是否闭合");
+                var reg = new Regex(@"(?<=\$\{Fields\})[\w\W]+(?=\$\{Fields\})");
+                return reg.Replace(template, GetFieldString(table, match.Value.Trim(' ')).Trim()).Replace("${Fields}", "");
             }
-            templateArr[0] = templateArr[0].TrimEnd(' ');
-            templateArr[1] = GetFieldString(table, templateArr[1]);
-            return string.Join("", templateArr);
+            return template;
         }
 
         /// <summary>
@@ -94,30 +93,42 @@ namespace CSRobot.GenerateEntityTools.Builders
             {
                 //把模板分成行，分别处理
                 var lines = fieldTamplate.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+                var newFieldTamplate = new StringBuilder();
                 foreach (var line in lines)
                 {
                     var newLine = line;
-                    //这里目前只实现了FieldSize的整行不输出
-                    if (newLine.Trim().StartsWith("$?"))
+                    if (newLine.Trim().StartsWith("$?{"))
                     {
-                        if (field.FieldSize.HasValue)
+                        var match = Regex.Match(newLine, @"(?<=\$\?\{)[\w]+(?=\})");
+                        if (match.Success)
                         {
-                            newLine = newLine.Replace("${FieldSize}", field.FieldSize.Value.ToString()).Replace("$?", "");
-                            fields.AppendLine(newLine);
+                            var valueResult = field.GetType().GetProperty(match.Value).GetValue(field);
+                            if (valueResult != null && valueResult.ToString() != "")
+                            {
+                                newLine = newLine.Replace($"$?{{{match.Value}}}", "");
+                                newFieldTamplate.AppendLine(newLine);
+                            }
                         }
                     }
                     else
                     {
-                        newLine = newLine.Replace("${FieldDescribe}", field.FieldDescribe);
-                        newLine = newLine.Replace("${DBType}", _typeMap[field.DBType]);
-                        newLine = newLine.Replace("${FieldName}", field.FieldName);
-                        if (field.FieldSize.HasValue)
-                        {
-                            newLine = newLine.Replace("${FieldSize}", field.FieldSize.Value.ToString());
-                        }
-                        fields.AppendLine(newLine);
+                        newFieldTamplate.AppendLine(newLine);
                     }
                 }
+                var fieldContent = newFieldTamplate.ToString();
+                foreach (var pro in field.GetType().GetProperties())
+                {
+                    if (pro.Name != "DBType")
+                    {
+                        fieldContent = fieldContent.Replace($"${{{pro.Name}}}", pro.GetValue(field)?.ToString());
+                    }
+                    else
+                    {
+                        fieldContent = fieldContent.Replace("${DBType}", _typeMap[field.DBType]);
+                    }
+                }
+                fields.AppendLine(fieldContent);
             }
             return fields.ToString();
         }
@@ -158,10 +169,10 @@ namespace ${DataBaseName}
     public class ${TableName}
     {
         ${Fields}
-        /// <summary>
-        /// ${FieldDescribe}
-        /// </summary>
-        $?[BField(Length=${FieldSize})]
+        $?{FieldDescribe}/// <summary>
+        $?{FieldDescribe}/// ${FieldDescribe}
+        $?{FieldDescribe}/// </summary>
+        $?{FieldSize}[BField(Length=${FieldSize},Name=""${FieldName}"")]
         public ${DBType} ${FieldName}
         { get; set; }
         ${Fields}
