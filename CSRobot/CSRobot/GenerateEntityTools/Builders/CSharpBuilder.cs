@@ -1,7 +1,5 @@
 ﻿
 using CSRobot.GenerateEntityTools.Entity;
-using Npgsql.TypeHandlers.GeometricHandlers;
-using Org.BouncyCastle.Crypto.Modes.Gcm;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -40,12 +38,31 @@ namespace CSRobot.GenerateEntityTools.Builders
                 //生成所有表实体类
                 foreach (var table in database.Tables)
                 {
-                    var codeString = GetCodeString(database.DataBaseName, table, template.Template);
-                    File.WriteAllText($"{basePath}/{table.TableName}{template.Extension}", codeString.ToString(), Encoding.UTF8);
+                    var filePath = $"{basePath}/{table.TableName}{template.Extension}";
+                    if (File.Exists(filePath))
+                    {
+                        Console.WriteLine($"{filePath}已存在，是否覆盖？Y为覆盖，N为不覆盖");
+                        if (Console.ReadLine().ToLower() == "y")
+                        {
+                            var codeString = GetCodeString(database.DataBaseName, table, template.Template);
+                            File.WriteAllText(filePath, codeString.ToString(), Encoding.UTF8);
+                        }
+                    }
+                    else
+                    {
+                        var codeString = GetCodeString(database.DataBaseName, table, template.Template);
+                        File.WriteAllText(filePath, codeString.ToString(), Encoding.UTF8);
+                    }
                 }
             }
         }
-
+        /// <summary>
+        /// 模板替换
+        /// </summary>
+        /// <param name="dataBaseName"></param>
+        /// <param name="table"></param>
+        /// <param name="template"></param>
+        /// <returns></returns>
         private string GetCodeString(string dataBaseName, Table table, string template)
         {
             template = template.Replace("${DataBaseName}", dataBaseName);
@@ -58,59 +75,36 @@ namespace CSRobot.GenerateEntityTools.Builders
             {
                 throw new ApplicationException("请检查${Fields}是否闭合");
             }
+            templateArr[0] = templateArr[0].TrimEnd(' ');
             templateArr[1] = GetFieldString(table, templateArr[1]);
             return string.Join("", templateArr);
         }
 
-        private string GetFieldString1(Table table, string fieldTamplate)
-        {
-            var fields = new StringBuilder();
-
-            foreach (var field in table.Fields)
-            {
-                var fieldTamplateValue = fieldTamplate;
-                fieldTamplateValue = fieldTamplateValue.Replace("${FieldDescribe}", field.FieldDescribe);
-                fieldTamplateValue = fieldTamplateValue.Replace("${DBType}", _typeMap[field.DBType]);
-                fieldTamplateValue = fieldTamplateValue.Replace("${FieldName}", field.FieldName);
-                if (field.FieldSize.HasValue)
-                {
-                    fieldTamplateValue = fieldTamplateValue.Replace("${FieldSize}", field.FieldSize.Value.ToString());
-                }
-                fields.Append(fieldTamplateValue);
-            }
-            return fields.ToString();
-        }
-
+        /// <summary>
+        /// 处理属性
+        /// </summary>
+        /// <param name="table"></param>
+        /// <param name="fieldTamplate"></param>
+        /// <returns></returns>
         private string GetFieldString(Table table, string fieldTamplate)
         {
             var fields = new StringBuilder();
 
             foreach (var field in table.Fields)
             {
+                //把模板分成行，分别处理
                 var lines = fieldTamplate.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var line in lines)
                 {
                     var newLine = line;
-
+                    //这里目前只实现了FieldSize的整行不输出
                     if (newLine.Trim().StartsWith("$?"))
                     {
                         if (field.FieldSize.HasValue)
                         {
-                            newLine = newLine.Replace("${FieldSize}", field.FieldSize.Value.ToString()).Replace("$?","");
+                            newLine = newLine.Replace("${FieldSize}", field.FieldSize.Value.ToString()).Replace("$?", "");
                             fields.AppendLine(newLine);
                         }
-                        //if(!string.IsNullOrEmpty(field.FieldDescribe))
-                        //{
-                        //    newLine = newLine.Replace("${FieldDescribe}", field.FieldDescribe).Replace("$?", "");                     
-                        //}
-                        //if (!string.IsNullOrEmpty(_typeMap[field.DBType]))
-                        //{                          
-                        //    newLine = newLine.Replace("${DBType}", _typeMap[field.DBType]).Replace("$?", "");                        
-                        //}
-                        //if (!string.IsNullOrEmpty(field.FieldName))
-                        //{                   
-                        //    newLine = newLine.Replace("${FieldName}", field.FieldName).Replace("$?", "");
-                        //}
                     }
                     else
                     {
@@ -127,6 +121,12 @@ namespace CSRobot.GenerateEntityTools.Builders
             }
             return fields.ToString();
         }
+        /// <summary>
+        /// 处理输出路径
+        /// </summary>
+        /// <param name="options"></param>
+        /// <param name="dataBaseName"></param>
+        /// <returns></returns>
         private string GetOut(CommandOptions options, string dataBaseName)
         {
             if (options.ContainsKey("--out"))
@@ -140,6 +140,11 @@ namespace CSRobot.GenerateEntityTools.Builders
                 return basePath;
             }
         }
+        /// <summary>
+        /// 处理模板
+        /// </summary>
+        /// <param name="options"></param>
+        /// <returns></returns>
         private (string Template, string Extension) GetTamplate(CommandOptions options)
         {
             var template = @"
@@ -299,7 +304,5 @@ namespace ${DataBaseName}
                     break;
             }
         }
-
-
     }
 }

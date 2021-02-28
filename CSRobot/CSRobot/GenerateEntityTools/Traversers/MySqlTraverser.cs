@@ -1,21 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using CSRobot.GenerateEntityTools.Entity;
-using MySql.Data;
 using MySql.Data.MySqlClient;
 
 namespace CSRobot.GenerateEntityTools.Traversers
 {
     public class MySqlTraverser : Traverser
     {
-
         MySqlConnectionStringBuilder _connectionStringBuilder;
-
         public MySqlTraverser(CommandOptions options) : base(options)
         {
             if (IsExistOption)
@@ -96,8 +88,5 @@ namespace CSRobot.GenerateEntityTools.Traversers
                 }
             }
         }
-
     }
-
-
 }
