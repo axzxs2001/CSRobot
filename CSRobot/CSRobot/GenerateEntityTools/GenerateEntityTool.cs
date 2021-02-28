@@ -50,21 +50,9 @@ namespace CSRobot.GenerateEntityTools
                 Console.WriteLine("--dbtype是必填参数");
                 return false;
             }
-            if (options.ContainsKey("--to"))
-            {
-                switch (options["--to"].ToLower())
-                {
-                    case "cs":
-                        builder = new CSharpBuilder(options["--dbtype"].ToLower());
-                        break;
-                    case "go":
-                        break;
-                }
-            }
-            else
-            {
-                builder = new CSharpBuilder(options["--dbtype"].ToLower());
-            }
+
+            builder = new CSharpBuilder();
+
             if (traverser != null && builder != null)
             {
                 builder.Build(traverser.Traverse(), options);

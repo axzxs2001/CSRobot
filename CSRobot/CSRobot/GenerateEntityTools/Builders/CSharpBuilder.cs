@@ -14,12 +14,15 @@ namespace CSRobot.GenerateEntityTools.Builders
 
     public class CSharpBuilder : IBuilder
     {
+        Dictionary<string, string> _typeMap;
         public void Build(DataBase database, CommandOptions options)
         {
             //取输出路径
             var basePath = GetOut(options, database.DataBaseName);
 
             var template = GetTamplate(options);
+
+            _typeMap = GetMapTypes(options)[$"{options["--dbtype"].ToLower()}-{template.Extension.TrimStart('.')}"];
             //生成独立的表
             if (options.ContainsKey("--table"))
             {
@@ -213,13 +216,39 @@ namespace ${DataBaseName}
             }
         }
 
-        Dictionary<string, string> _typeMap;
-        public CSharpBuilder(string dbType)
+
+
+        private Dictionary<string, Dictionary<string, string>> GetMapTypes(CommandOptions options)
         {
-            switch (dbType)
+            if (options.ContainsKey("--map"))
             {
-                case "postgresql":
-                    _typeMap = new Dictionary<string, string>
+                var path = options["--map"];
+                if (path.StartsWith("http"))
+                {
+                    var client = new HttpClient();
+                    var request = new HttpRequestMessage(HttpMethod.Get, path);
+                    var response = client.SendAsync(request).Result;
+                    if (response.StatusCode == HttpStatusCode.OK)
+                    {
+                        var mapJson = response.Content.ReadAsStringAsync().Result;
+                        return System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, string>>>(mapJson);
+                    }
+                    else
+                    {
+                        throw new ApplicationException("获取映射类型失败");
+                    }
+                }
+                else
+                {
+                    var mapJson = File.ReadAllText(path, Encoding.UTF8);
+                    return System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, string>>>(mapJson);
+                }
+            }
+            else
+            {
+                var typeMap = new Dictionary<string, Dictionary<string, string>>()
+                {
+                    {"PostgreSqlToCS",new Dictionary<string, string>
                     {
                         {"bigint","long" },//   int8    有符号8字节整数
                         {"bigserial" ,"long" },//   serial8 自增8字节整数
@@ -242,20 +271,16 @@ namespace ${DataBaseName}
                         {"serial","int" },  //   serial4 自增 4 字节整数
                         {"text","string" },  //        可变长字符串
                         {"varchar","string" },  //        可变长字符串
-                        {"time","DateTime" } , //  [ (p) ] [ without time zone ]      一天中的时刻(无时区)
-                       // {"time","DateTime" } , // [ (p) ] with time zone timetz  一天中的时刻，含时区
-                        {"timestamp","DateTime" },  //  [ (p) ] [ without time zone ]     日期与时刻(无时区)
-                       // {"timestamp","DateTime" },  // [ (p) ] with time zone    timestamptz 日期与时刻，含时区
+                        {"time","DateTime" } ,
+                        {"timestamp","DateTime" },
                         {"tsquery","string" },  //    文本检索查询
                         {"tsvector","string" },  //      文本检索文档
                         {"txid_snapshot","string" },  //      用户级别的事务ID快照
                         {"uuid","string" } , //     通用唯一标识符
                         {"xml","string" } , //  XML 数据
                         {"json","string" },  //      JSON 数据
-                    };
-                    break;
-                case "mysql":
-                    _typeMap = new Dictionary<string, string>
+                    }},
+                    {"MySqlToCS",new Dictionary<string, string>
                     {
                         {"char","char" },
                         {"varchar","string" },
@@ -279,10 +304,8 @@ namespace ${DataBaseName}
                         {"timestamp","string" },
                         {"time","DateTime" },
                         {"boolean","bool" },
-                    };
-                    break;
-                case "mssql":
-                    _typeMap = new Dictionary<string, string>
+                    }},
+                    {"MsSqlToCS", new Dictionary<string, string>
                     {
                         { "char", "string" },// 固定长度的字符串。最多 8,000 个字符。	n
                         { "varchar", "string" },//(n)  可变长度的字符串。最多 8,000 个字符。	 
@@ -311,9 +334,11 @@ namespace ${DataBaseName}
                         { "time", "DateTime" },//    仅存储时间。精度为 100 纳秒。	3-5 bytes
                         { "datetimeoffset", "string" },//  与 datetime2 相同，外加时区偏移。	8-10 bytes
                         { "timestamp", "string" }//   存储唯一的
-                    };
-                    break;
+                    }}
+                };
+                return typeMap;
             }
         }
+
     }
 }

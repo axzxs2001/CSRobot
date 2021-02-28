@@ -1,18 +1,19 @@
 using System;
 
-namespace ${DataBaseName}
+namespace ${DataBaseName }
 {
     /// <summary>
     /// ${TableDescribe}
     /// </summary>
-    public record ${TableName}
+    public class ${TableName}
     {
-        ${Fields}
-        /// <summary>
-        /// ${FieldDescribe}
-        /// </summary>
-        public ${DBType} ${FieldName}
+        ${ Fields}
+        $?{ FieldDescribe}/// <summary>
+        $?{ FieldDescribe}/// ${FieldDescribe}
+        $?{ FieldDescribe}/// </summary>
+        $?{ FieldSize}[BField(Length =${ FieldSize},Name = ""${ FieldName}"")]
+        public ${ DBType} ${ FieldName}
         { get; set; }
-        ${Fields}
+        ${ Fields}
     }
 }
