@@ -85,6 +85,7 @@ namespace ${DataBaseName }
   },
 ~~~
 
+## 案例
 从MySql库生成实体类
 >csrobot gen --dbtype=mssql --to=cs --tep=https://raw.githubusercontent.com/axzxs2001/CSRebot/main/CSRebot/gen/gen_cs_record.cs --host=127.0.0.1 --db=stealthdb --user=sa --pwd=sa
 
