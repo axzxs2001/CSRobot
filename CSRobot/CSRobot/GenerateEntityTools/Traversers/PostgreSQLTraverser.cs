@@ -1,13 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using CSRobot.GenerateEntityTools.Entity;
-using MySql.Data;
-using MySql.Data.MySqlClient;
 using Npgsql;
 
 namespace CSRobot.GenerateEntityTools.Traversers
@@ -15,7 +9,7 @@ namespace CSRobot.GenerateEntityTools.Traversers
     public class PostgreSqlTraverser : Traverser
     {
 
-        NpgsqlConnectionStringBuilder _connectionStringBuilder;
+        readonly NpgsqlConnectionStringBuilder _connectionStringBuilder;
 
         public PostgreSqlTraverser(CommandOptions options) : base(options)
         {
@@ -45,13 +39,92 @@ namespace CSRobot.GenerateEntityTools.Traversers
         {
             return GetDataBase();
         }
-        DataBase GetDataBase()
+        //        DataBase GetDataBase()
+        //        {
+        //            var dataBase = new DataBase()
+        //            {
+        //                DataBaseName = _connectionStringBuilder.Database
+        //            };
+
+        //            using (var con = new NpgsqlConnection(_connectionStringBuilder.ConnectionString))
+        //            {
+        //                var sql = @$"select relname as tablename,cast(obj_description(relfilenode,'pg_class') as varchar) as tabledescribe from pg_class c where relname in (SELECT tablename FROM pg_tables WHERE tablename NOT LIKE 'pg%' AND tablename NOT LIKE 'sql_%');";
+        //                var cmd = new NpgsqlCommand(sql, con);
+        //                con.Open();
+        //                var reader = cmd.ExecuteReader();
+        //                while (reader.Read())
+        //                {
+        //                    var table = new Table
+        //                    {
+        //                        TableName = reader.GetFieldValue<string>("tablename")
+        //                    };
+        //                    if (reader.GetFieldValue<object>("tabledescribe") != DBNull.Value)
+        //                    {
+        //                        table.TableDescribe = reader.GetFieldValue<string>("tabledescribe");
+        //                    }
+        //                    dataBase.Tables.Add(table);
+        //                }
+        //                con.Close();
+        //            }
+        //            GetFields(dataBase);
+        //            return dataBase;
+        //        }
+
+
+        //        void GetFields(DataBase dataBase)
+        //        {
+        //            foreach (var table in dataBase.Tables)
+        //            {
+        //                var sql = @$"SELECT a.attname AS fieldname, 
+        //t.typname AS dbtype,  
+        //case when a.atttypmod=-1 then null else a.atttypmod end AS fieldsize, 
+        //b.description AS fielddescribe
+        //FROM pg_class c, pg_attribute a
+        //    LEFT JOIN pg_description b
+        //    ON a.attrelid = b.objoid  AND a.attnum = b.objsubid, pg_type t
+        //WHERE c.relname = '{table.TableName}'
+        //    AND a.attnum > 0
+        //    AND a.attrelid = c.oid
+        //    AND a.atttypid = t.oid";
+
+        //                using var con = new NpgsqlConnection(_connectionStringBuilder.ConnectionString);
+        //                var cmd = new NpgsqlCommand(sql, con);
+        //                con.Open();
+        //                var reader = cmd.ExecuteReader();
+        //                while (reader.Read())
+        //                {
+        //                    var field = new Field
+        //                    {
+        //                        FieldName = reader.GetFieldValue<string>("fieldname")
+        //                    };
+        //                    if (reader.GetFieldValue<object>("fielddescribe") != DBNull.Value)
+        //                    {
+        //                        field.FieldDescribe = reader.GetFieldValue<string>("fielddescribe");
+        //                    }
+        //                    field.DBType = reader.GetFieldValue<string>("dbtype");
+        //                    if (reader.GetFieldValue<object>("fieldsize") != DBNull.Value)
+        //                    {
+        //                        field.FieldSize = reader.GetFieldValue<int>("fieldsize");
+        //                    }
+        //                    table.Fields.Add(field);
+        //                }
+        //            }
+        //        }
+
+        private DataBase GetDataBase()
         {
             var dataBase = new DataBase()
             {
                 DataBaseName = _connectionStringBuilder.Database
             };
+            dataBase.Tables = GetTables();
+            return dataBase;
+        }
 
+        private IEnumerable<Dictionary<string, object>> GetTables()
+        {
+
+            var resultList = new List<Dictionary<string, object>>();
             using (var con = new NpgsqlConnection(_connectionStringBuilder.ConnectionString))
             {
                 var sql = @$"select relname as tablename,cast(obj_description(relfilenode,'pg_class') as varchar) as tabledescribe from pg_class c where relname in (SELECT tablename FROM pg_tables WHERE tablename NOT LIKE 'pg%' AND tablename NOT LIKE 'sql_%');";
@@ -60,24 +133,29 @@ namespace CSRobot.GenerateEntityTools.Traversers
                 var reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    var table = new Table();
-                    table.TableName = reader.GetFieldValue<string>("tablename");
-                    if (reader.GetFieldValue<object>("tabledescribe") != DBNull.Value)
+                    var entity = new Dictionary<string, object>();
+                    for (int i = 0; i < reader.FieldCount; i++)
                     {
-                        table.TableDescribe = reader.GetFieldValue<string>("tabledescribe");
+                        var value = reader.GetValue(i);
+                        entity[reader.GetName(i)] = value;
                     }
-                    dataBase.Tables.Add(table);
+                    resultList.Add(entity);
                 }
                 con.Close();
             }
-            GetFields(dataBase);
-            return dataBase;
+            foreach (var entity in resultList)
+            {
+                var fields = GetFields(entity["tablename"].ToString());
+                entity["fields"] = fields;
+            }
+            return resultList;
+
         }
 
-
-        void GetFields(DataBase dataBase)
+        private IEnumerable<Dictionary<string, object>> GetFields(string tableName)
         {
-            foreach (var table in dataBase.Tables)
+            var resultList = new List<Dictionary<string, object>>();
+            using (var con = new NpgsqlConnection(_connectionStringBuilder.ConnectionString))
             {
                 var sql = @$"SELECT a.attname AS fieldname, 
 t.typname AS dbtype,  
@@ -86,35 +164,27 @@ b.description AS fielddescribe
 FROM pg_class c, pg_attribute a
     LEFT JOIN pg_description b
     ON a.attrelid = b.objoid  AND a.attnum = b.objsubid, pg_type t
-WHERE c.relname = '{table.TableName}'
+WHERE c.relname = '{tableName}'
     AND a.attnum > 0
     AND a.attrelid = c.oid
-    AND a.atttypid = t.oid";
+    AND a.atttypid = t.oid"; var cmd = new NpgsqlCommand(sql, con);
+                con.Open();
+                var reader = cmd.ExecuteReader();
 
-                using (var con = new NpgsqlConnection(_connectionStringBuilder.ConnectionString))
+                while (reader.Read())
                 {
-                    var cmd = new NpgsqlCommand(sql, con);
-                    con.Open();
-                    var reader = cmd.ExecuteReader();
-                    while (reader.Read())
+                    var entity = new Dictionary<string, object>();
+                    for (int i = 0; i < reader.FieldCount; i++)
                     {
-                        var field = new Field();
-                        field.FieldName = reader.GetFieldValue<string>("fieldname");
-                        if (reader.GetFieldValue<object>("fielddescribe") != DBNull.Value)
-                        {
-                            field.FieldDescribe = reader.GetFieldValue<string>("fielddescribe");
-                        }
-                        field.DBType = reader.GetFieldValue<string>("dbtype");
-                        if (reader.GetFieldValue<object>("fieldsize") != DBNull.Value)
-                        {
-                            field.FieldSize = reader.GetFieldValue<int>("fieldsize");
-                        }
-                        table.Fields.Add(field);
+                        var value = reader.GetValue(i);
+                        entity[reader.GetName(i)] = value;
                     }
+                    resultList.Add(entity);
                 }
+                con.Close();
             }
+            return resultList;
         }
-
     }
 
 

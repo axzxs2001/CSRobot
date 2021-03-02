@@ -35,10 +35,10 @@ namespace CSRobot.GenerateEntityTools
                 switch (options["--dbtype"].ToLower())
                 {
                     case "mysql":
-                        traverser = new MySqlTraverser(options);
+                       // traverser = new MySqlTraverser(options);
                         break;
                     case "mssql":
-                        traverser = new MsSqlTraverser(options);
+                       // traverser = new MsSqlTraverser(options);
                         break;
                     case "postgresql":
                         traverser = new PostgreSqlTraverser(options);

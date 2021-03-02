@@ -31,7 +31,7 @@ namespace CSRobot
             //postgres
             //args = new string[] { "gen", "--dbtype=postgresql", "--to=cs", "--tep=https://raw.githubusercontent.com/axzxs2001/CSRobot/main/CSRobot/gen/gen_cs_record.cs",  "--host=127.0.01", "--db=stealthdb", "--user=postgres","--pwd=postgres2018" };
             //mssql
-            args = new string[] { "gen", "--dbtype=mssql", @"--map=C:\MyFile\Source\Repos\CSRobot\CSRobot\gen\map.json", "--host=127.0.0.1", "--db=stealthdb", "--user=sa", "--pwd=sa" };
+            args = new string[] { "gen", "--dbtype=postgresql", @"--map=C:\MyFile\Source\Repos\axzxs2001\CSRobot\CSRobot\gen\map.json", "--host=127.0.0.1", "--db=StarPayAgent", "--user=postgres", "--pwd=postgres2018" };
             //appsettings
             // args = new string[] { "gen", "--dbtype=mssql", "--to=cs", "--tep=https://raw.githubusercontent.com/axzxs2001/CSRobot/main/CSRobot/gen/gen_cs_record.cs", "--db=stealthdb", "--user=sa", "--pwd=sa" };
 

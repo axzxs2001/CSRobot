@@ -2,6 +2,7 @@
 using CSRobot.GenerateEntityTools.Entity;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -26,11 +27,11 @@ namespace CSRobot.GenerateEntityTools.Builders
             //生成独立的表
             if (options.ContainsKey("--table"))
             {
-                var table = database.Tables.SingleOrDefault(s => s.TableName == options["--table"]);
+                var table = database.Tables.SingleOrDefault(s => s["tablename"].ToString() == options["--table"]);
                 if (table != null)
                 {
                     var codeString = GetCodeString(database.DataBaseName, table, template.Template);
-                    File.WriteAllText($"{basePath}/{table.TableName}{template.Extension}", codeString.ToString(), Encoding.UTF8);
+                    File.WriteAllText($"{basePath}/{table["tablename"]}{template.Extension}", codeString.ToString(), Encoding.UTF8);
                 }
                 else
                 {
@@ -42,10 +43,14 @@ namespace CSRobot.GenerateEntityTools.Builders
                 //生成所有表实体类
                 foreach (var table in database.Tables)
                 {
-                    var filePath = $"{basePath}/{table.TableName}{template.Extension}";
+                    var filePath = $"{basePath}/{table["tablename"]}{template.Extension}";
                     if (File.Exists(filePath))
                     {
-                        Console.WriteLine($"{filePath}已存在，是否覆盖？Y为覆盖，N为不覆盖");
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine($"{filePath}已存在");
+                        Console.ResetColor();
+
+                        Console.WriteLine("覆盖请按 Y(y)，否则请按其他键：");
                         if (Console.ReadLine().ToLower() == "y")
                         {
                             var codeString = GetCodeString(database.DataBaseName, table, template.Template);
@@ -67,11 +72,26 @@ namespace CSRobot.GenerateEntityTools.Builders
         /// <param name="table"></param>
         /// <param name="template"></param>
         /// <returns></returns>
-        private string GetCodeString(string dataBaseName, Table table, string template)
+        private string GetCodeString(string dataBaseName, Dictionary<string, object> table, string template)
         {
-            template = template.Replace("${DataBaseName}", dataBaseName);
-            template = template.Replace("${TableDescribe}", table.TableDescribe);
-            template = template.Replace("${TableName}", table.TableName);
+
+            var matchs = Regex.Matches(template, @"(?<=\$\{)[\w]+(?=\})");
+            foreach (Match item in matchs)
+            {
+                if (item.Value.ToLower() == "fields")
+                {
+                    continue;
+                }
+                if (table.ContainsKey(item.Value))
+                {
+                    template = template.Replace($"${{{item.Value}}}", table[item.Value].ToString());
+                }
+                // Console.WriteLine(item.Value);
+            }
+
+            //template = template.Replace("${DataBaseName}", dataBaseName);
+            //template = template.Replace("${TableDescribe}", table.TableDescribe);
+            //template = template.Replace("${TableName}", table.TableName);
 
             var match = Regex.Match(template, @"(?<=\$\{Fields\})[\w\W]+(?=\$\{Fields\})");
             if (match.Success)
@@ -88,11 +108,11 @@ namespace CSRobot.GenerateEntityTools.Builders
         /// <param name="table"></param>
         /// <param name="fieldTamplate"></param>
         /// <returns></returns>
-        private string GetFieldString(Table table, string fieldTamplate)
+        private string GetFieldString(Dictionary<string, object> table, string fieldTamplate)
         {
             var fields = new StringBuilder();
 
-            foreach (var field in table.Fields)
+            foreach (var field in table["fields"] as IEnumerable<Dictionary<string, object>>)
             {
                 //把模板分成行，分别处理
                 var lines = fieldTamplate.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
@@ -106,6 +126,7 @@ namespace CSRobot.GenerateEntityTools.Builders
                         var match = Regex.Match(newLine, @"(?<=\$\?\{)[\w]+(?=\})");
                         if (match.Success)
                         {
+                            //todo 这里要变
                             var valueResult = field.GetType().GetProperty(match.Value).GetValue(field);
                             if (valueResult != null && valueResult.ToString() != "")
                             {
@@ -122,13 +143,14 @@ namespace CSRobot.GenerateEntityTools.Builders
                 var fieldContent = newFieldTamplate.ToString();
                 foreach (var pro in field.GetType().GetProperties())
                 {
+                    //todo 这里要变
                     if (pro.Name != "DBType")
                     {
                         fieldContent = fieldContent.Replace($"${{{pro.Name}}}", pro.GetValue(field)?.ToString());
                     }
                     else
                     {
-                        fieldContent = fieldContent.Replace("${DBType}", _typeMap[field.DBType]);
+                        fieldContent = fieldContent.Replace("${DBType}", _typeMap[field["DBType"].ToString()]);
                     }
                 }
                 fields.AppendLine(fieldContent);
@@ -250,35 +272,35 @@ namespace ${DataBaseName}
                 {
                     {"PostgreSqlToCS",new Dictionary<string, string>
                     {
-                        {"bigint","long" },//   int8    有符号8字节整数
-                        {"bigserial" ,"long" },//   serial8 自增8字节整数
-                        {"bit","bool" },//  [ (n) ]     定长位串            
-                        {"boolean","bool" }, //bool    逻辑布尔值(真/假)
-                        {"bool","bool" }, //bool    逻辑布尔值(真/假)
-                        {"character","string" }, //varying [ (n) ]   varchar [ (n) ] 可变长字符串              
-                        {"cidr","string" }, //      IPv4 或 IPv6 网络地址
-                        {"date","DateTime" }  ,//        日历日期(年, 月, 日)
-                        {"double","double" }  ,//  precision    float8  双精度浮点数(8字节)
-                        {"inet","string" }  ,//       IPv4 或 IPv6 主机地址
-                        {"int4","int" } , // int, int4   有符号 4 字节整数  
-                        {"integer","int" } , // int, int4   有符号 4 字节整数  
-                        {"macaddr","string" } , //    MAC (Media Access Control)地址
-                        {"money","decimal" },  //      货币金额
-                        {"numeric","decimal" } , //  [ (p, s) ]  decimal [ (p, s) ]  可选精度的准确数值数据类型
-                        {"real","float" },  //    float4  单精度浮点数(4 字节)
-                        {"smallint","short" },  //    int2    有符号 2 字节整数
-                        {"smallserial","short" },  // serial2 自增 2 字节整数
-                        {"serial","int" },  //   serial4 自增 4 字节整数
-                        {"text","string" },  //        可变长字符串
-                        {"varchar","string" },  //        可变长字符串
+                        {"bigint","long" },
+                        {"bigserial" ,"long" },
+                        {"bit","bool" },
+                        {"boolean","bool" },
+                        {"bool","bool" },
+                        {"character","string" },
+                        {"cidr","string" },
+                        {"date","DateTime" }  ,
+                        {"double","double" }  ,
+                        {"inet","string" }  ,
+                        {"int4","int" } ,
+                        {"integer","int" } ,
+                        {"macaddr","string" } ,
+                        {"money","decimal" },
+                        {"numeric","decimal" } ,
+                        {"real","float" },
+                        {"smallint","short" },
+                        {"smallserial","short" },
+                        {"serial","int" },
+                        {"text","string" },
+                        {"varchar","string" },
                         {"time","DateTime" } ,
                         {"timestamp","DateTime" },
-                        {"tsquery","string" },  //    文本检索查询
-                        {"tsvector","string" },  //      文本检索文档
-                        {"txid_snapshot","string" },  //      用户级别的事务ID快照
-                        {"uuid","string" } , //     通用唯一标识符
-                        {"xml","string" } , //  XML 数据
-                        {"json","string" },  //      JSON 数据
+                        {"tsquery","string" },
+                        {"tsvector","string" },
+                        {"txid_snapshot","string" },
+                        {"uuid","string" } ,
+                        {"xml","string" } ,
+                        {"json","string" },
                     }},
                     {"MySqlToCS",new Dictionary<string, string>
                     {
@@ -307,33 +329,33 @@ namespace ${DataBaseName}
                     }},
                     {"MsSqlToCS", new Dictionary<string, string>
                     {
-                        { "char", "string" },// 固定长度的字符串。最多 8,000 个字符。	n
-                        { "varchar", "string" },//(n)  可变长度的字符串。最多 8,000 个字符。	 
-                        { "text", "string" },//    可变长度的字符串。最多 2GB 字符数据。
-                        { "nchar", "string" },//(n)    固定长度的 Unicode 数据。最多 4,000 个字符。	 
-                        { "nvarchar", "string" },//(n) 可变长度的 Unicode 数据。最多 4,000 个字符。	 
-                        { "ntext", "string" },//   可变长度的 Unicode 数据。最多 2GB 字符数据。
-                        { "bit", "bool" },//  允许 0、1 或 NULL
-                        { "binary", "string" },//(n)   固定长度的二进制数据。最多 8,000 字节。	 
-                        { "varbinary", "string" },//(n)    可变长度的二进制数据。最多 8,000 字节。	 
-                        { "image", "string" },//   可变长度的二进制数据。最多 2GB。
-                        { "tinyint", "byte" },// 允许从 0 到 255 的所有数字。	1 字节
-                        { "smallint", "short" },//    允许从 -32,768 到 32,767 的所有数字。	2 字节
-                        { "int", "int" },// 允许从 -2,147,483,648 到 2,147,483,647 的所有数字。	4 字节
-                        { "bigint", "long" },//  允许介于 -9,223,372,036,854,775,808 和 9,223,372,036,854,775,807 之间的所有数字。	8 字节
-                        { "decimal", "decimal" },//
-                        { "numeric", "decimal" },//
-                        { "smallmoney", "decimal" },//  介于 -214,748.3648 和 214,748.3647 之间的货币数据。	4 字节
-                        { "money", "decimal" },//   介于 -922,337,203,685,477.5808 和 922,337,203,685,477.5807 之间的货币数据。	8 字节
-                        { "float", "float" },//   从 -1.79E + 308 到 1.79E + 308 的浮动精度数字数据。 参数 n 指示该字段保存 4 字节还是 8 字节。f
-                        { "real", "double" },//    从 -3.40E + 38 到 3.40
-                        { "datetime", "DateTime" },//    从 1753 年 1 月 1 日 到 9999 年 12 月 31 日，精度为 3.33 毫秒。	8 bytes
-                        { "datetime2", "DateTime" },//   从 1753 年 1 月 1 日 到 9999 年 12 月 31 日，精度为 100 纳秒。	6-8 bytes
-                        { "smalldatetime", "DateTime" },//   从 1900 年 1 月 1 日 到 2079 年 6 月 6 日，精度为 1 分钟。	4 bytes
-                        { "date", "DateTime" },//    仅存储日期。从 0001 年 1 月 1 日 到 9999 年 12 月 31 日。	3 bytes
-                        { "time", "DateTime" },//    仅存储时间。精度为 100 纳秒。	3-5 bytes
-                        { "datetimeoffset", "string" },//  与 datetime2 相同，外加时区偏移。	8-10 bytes
-                        { "timestamp", "string" }//   存储唯一的
+                        { "char", "string" },
+                        { "varchar", "string" },
+                        { "text", "string" },
+                        { "nchar", "string" },
+                        { "nvarchar", "string" },
+                        { "ntext", "string" },
+                        { "bit", "bool" },
+                        { "binary", "string" },
+                        { "varbinary", "string" },
+                        { "image", "string" },
+                        { "tinyint", "byte" },
+                        { "smallint", "short" },
+                        { "int", "int" },
+                        { "bigint", "long" },
+                        { "decimal", "decimal" },
+                        { "numeric", "decimal" },
+                        { "smallmoney", "decimal" },
+                        { "money", "decimal" },
+                        { "float", "float" },
+                        { "real", "double" },
+                        { "datetime", "DateTime" },
+                        { "datetime2", "DateTime" },
+                        { "smalldatetime", "DateTime" },
+                        { "date", "DateTime" },
+                        { "time", "DateTime" },
+                        { "datetimeoffset", "string" },
+                        { "timestamp", "string" }
                     }}
                 };
                 return typeMap;
