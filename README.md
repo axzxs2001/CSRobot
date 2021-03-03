@@ -7,7 +7,7 @@ Nuget地址：
 安装命令：
 >dotnet tool install --global CSRobot --version 0.0.3
 
-模板文件夹：https://github.com/axzxs2001/CSRobot/tree/main/CSRobot/gen
+模板文件夹：https://github.com/axzxs2001/CSRobot/tree/main/CSRobot/gen，包含实体类模板，数据库到实体类型映身模板，查询表结构sql语句模板
 
 ### 命令
 >csrobot gen [options]
