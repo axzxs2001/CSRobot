@@ -12,9 +12,9 @@ namespace MyNameSpace
         $?{fielddescribe}/// ${fielddescribe}
         $?{fielddescribe}/// </summary>
         $?{fieldsize}
-        [BField(Length =${ fieldsize},Name = "${fieldname}")]
-        public ${ dbtype} ${ fieldname}
+        [BField(Length=${fieldsize},Name="${fieldname}")]
+        public ${dbtype} ${fieldname}
         { get; set; }
-        ${ Fields}
+        ${Fields}
     }
 }
