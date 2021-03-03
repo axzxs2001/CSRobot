@@ -17,7 +17,7 @@ Nuget地址：
 | ---------------- | :-----------  | 
 |--dbtype|数据库类型，必填，例如:--dbtype=mysql,--dbtype=mssql,--dbtype=postgressql|
 |--table	|指定数据库表名生成实体类，缺省默认全部库表|
-|--out	| 生成实体类的路径，缺省默认当前路径|
+|--out	| 生成实体类的路径，缺省默认输出文件到当前路径下entities目录中|
 |--tep  <img width=100/>	|生成实体类的模板，可以是内置的模板cs，或指定本地路径，或指定url，生成文件的扩展名与指定的模板扩展名匹配。缺省默认cs内置模板，例如:--tep=/usr/abc/bcd.cs；--tep=https://github.com/abc/bcd.cs；--tep=cs|
 |--map|生成实体类字段时，数据库到实体类的字段映射模板，缺省值为内置的模板，或指定本地路径，或指定url，例如:--map=/usr/abc/bcd.json；--map=https://github.com/axzxs2001/CSRobot/blob/main/CSRobot/gen/map.json|
 |--host |	连接数据所在主机，如果缺少此项，会查找当前目录或子目录中的是否存在appsettings.json配置文件，并取配置文件下的ConnectionStrings节点的第一个子节点的值作为连接字符串|
@@ -32,7 +32,7 @@ Nuget地址：
 ~~~ C#
 using System;
 
-namespace ${DataBaseName }
+namespace MyNameSpace
 {
     /// <summary>
     /// ${TableDescribe}
@@ -51,38 +51,114 @@ namespace ${DataBaseName }
 }
 ~~~
 ### map
-下面例子是MS SqlServer与csharp的类型映射
+下面例子是DB与c#的类型映射
 ~~~ json
 {
   "mssql-cs": {
-    "char": "string",
-    "varchar": "string",
-    "text": "string",
-    "nchar": "string",
-    "nvarchar": "string",
-    "ntext": "string",
-    "bit": "bool",
-    "binary": "string",
-    "varbinary": "string",
-    "image": "string",
-    "tinyint": "byte",
-    "smallint": "short",
-    "int": "int",
     "bigint": "long",
-    "decimal": "decimal",
-    "numeric": "decimal",
-    "smallmoney": "decimal",
-    "money": "decimal",
-    "float": "float",
-    "real": "double",
+    "binary": "Byte[]",
+    "bit": "bool",
+    "char": "string",
+    "date": "DateTime",
     "datetime": "DateTime",
     "datetime2": "DateTime",
-    "smalldatetime": "DateTime",
-    "date": "DateTime",
-    "time": "DateTime",
     "datetimeoffset": "DateTimeOffset",
-    "timestamp": "string"
+    "decimal": "decimal",
+    "float": "double",
+    "image": "Byte[]",
+    "int": "int",
+    "money": "decimal",
+    "nchar": "string",
+    "ntext": "string",
+    "numeric": "double",
+    "nvarchar": "string",
+    "real": "float",
+    "rowversion": "Byte[]",
+    "smalldatetime": "DateTime",
+    "smallint": "short",
+    "smallmoney": "decimal",
+    "text": "string",
+    "time": "TimeSpan",
+    "timestamp": "Byte[]",
+    "tinyint": "Byte",
+    "uniqueidentifier": "Guid",
+    "varbinary": "Byte[]",
+    "varchar": "string",
+    "xml": "string"
   },
+  "mysql-cs": {
+    "char": "string",
+    "varchar": "string",
+    "binary": "byte[]",
+    "varbinary": "byte[]",
+    "tinyblob": "btye[]",
+    "tinytext": "string",
+    "text": "string",
+    "blob": "byte[]",
+    "mediumtext": "string",
+    "mediumblob": "byte[]",
+    "longtext": "string",
+    "longblob": "byte[]",
+    "enum": "string",
+    "bit": "short",
+    "tinyint": "byte",
+    "bool": "bool",
+    "boolean": "bool",
+    "smallint": "short",
+    "mediumint": "short",
+    "int": "int32",
+    "integer": "int32",
+    "bigint": "long",
+    "float": "float",
+    "double": "double",
+    "double precision": "double",
+    "decimal": "decimal",
+    "dec": "decimal",
+    "date": "datetime",
+    "datetime": "datetime",
+    "timestamp": "datetime",
+    "time": "datetime",
+    "year": "short"
+  },
+  "postgresql-cs": {
+    "bigint": "long",
+    "int8": "long",
+    "bigserial": "long",
+    "serial8": "long",
+    "boolean": "bool",
+    "bool": "bool",
+    "bytea": "Byte[]",
+    "character": "string",
+    "char": "string",
+    "character varying": "string",
+    "varchar": "string",
+    "date": "DateTime",
+    "double precision": "double",
+    "float8": "double",
+    "integer": "int",
+    "int4": "int",
+    "interval": "string",
+    "money": "decimal",
+    "numeric": "decimal",
+    "decimal": "decimal",
+    "real": "float",
+    "float4": "float",
+    "smallint": "short",
+    "int2": "short",
+    "smallserial": "short",
+    "serial2": "short",
+    "serial": "int",
+    "serial4": "int",
+    "text": "string",
+    "time": "DateTime",
+    "time with time zone": "DateTimeOffset",
+    "timetz": "DateTimeOffset",
+    "timestamp": "DateTime",
+    "timestamp with time zone": "DateTimeOffset",
+    "timestamptz": "DateTimeOffset",
+    "uuid": "GUID"
+  }
+}
 ~~~
 
 ## 案例
