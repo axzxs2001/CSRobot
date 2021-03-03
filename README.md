@@ -54,35 +54,39 @@ namespace MyNameSpace
 下面例子是MS SqlServer与csharp的类型映射
 ~~~ json
 {
-  "mssql-cs": {
-    "char": "string",
-    "varchar": "string",
-    "text": "string",
-    "nchar": "string",
-    "nvarchar": "string",
-    "ntext": "string",
-    "bit": "bool",
-    "binary": "string",
-    "varbinary": "string",
-    "image": "string",
-    "tinyint": "byte",
-    "smallint": "short",
-    "int": "int",
+"mssql-cs": {
     "bigint": "long",
-    "decimal": "decimal",
-    "numeric": "decimal",
-    "smallmoney": "decimal",
-    "money": "decimal",
-    "float": "float",
-    "real": "double",
+    "binary": "Byte[]",
+    "bit": "bool",
+    "char": "string",
+    "date": "DateTime",
     "datetime": "DateTime",
     "datetime2": "DateTime",
-    "smalldatetime": "DateTime",
-    "date": "DateTime",
-    "time": "DateTime",
     "datetimeoffset": "DateTimeOffset",
-    "timestamp": "string"
-  },
+    "decimal": "decimal",
+    "float": "double",
+    "image": "Byte[]",
+    "int": "int",
+    "money": "decimal",
+    "nchar": "string",
+    "ntext": "string",
+    "numeric": "double",
+    "nvarchar": "string",
+    "real": "float",
+    "rowversion": "Byte[]",
+    "smalldatetime": "DateTime",
+    "smallint": "short",
+    "smallmoney": "decimal",
+    "text": "string",
+    "time": "TimeSpan",
+    "timestamp": "Byte[]",
+    "tinyint": "Byte",
+    "uniqueidentifier": "Guid",
+    "varbinary": "Byte[]",
+    "varchar": "string",
+    "xml": "string"
+  }
+}
 ~~~
 
 ## 案例
