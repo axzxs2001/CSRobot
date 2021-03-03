@@ -12,6 +12,12 @@ Nuget地址：
 ### 命令
 >csrobot gen [options]
  
+ 说明：
+ gen是完成从数据库表结构生成实体类的小工具
+1. 可以按照 sql模板或内置 sql查询库中的表，表中的字段
+2. 配置库和实体类的映射
+3. 按照实体模板生成实体类文件
+ 
 ### csrobot gen [options]
 |参数选项|描述|
 | ---------------- | :-----------  | 
@@ -28,25 +34,28 @@ Nuget地址：
 
 
 ### tep
-如果生成的实体是cs的，模板文件的扩展名为.cs,内容如下例，其中${}的选项是固定选项，分别代表字面含义
+如果生成的实体是cs的，模板文件的扩展名为.cs,内容如下例，
+${}的选项是固定选项，分别代表从数据库中查询到的数据字段
+$?{}是判断条件，如果有值，本行显示，否则本行不显示
+$map{}本字段完成类型映射
 ~~~ C#
 using System;
 
 namespace MyNameSpace
 {
     /// <summary>
-    /// ${TableDescribe}
+    /// ${tabledescribe}
     /// </summary>
-    public class ${TableName}
+    public class ${tablename}
     {
-        ${ Fields}
-        $?{ FieldDescribe}/// <summary>
-        $?{ FieldDescribe}/// ${FieldDescribe}
-        $?{ FieldDescribe}/// </summary>
-        $?{ FieldSize}[BField(Length =${ FieldSize},Name = ""${ FieldName}"")]
-        public ${ DBType} ${ FieldName}
+        ${Fields}
+        $?{fielddescribe}/// <summary>
+        $?{fielddescribe}/// ${fielddescribe}
+        $?{fielddescribe}/// </summary>
+        $?{fieldsize}[BField(Length=${fieldsize},Name="${fieldname}")]
+        public $map{dbtype} ${fieldname}
         { get; set; }
-        ${ Fields}
+        ${Fields}
     }
 }
 ~~~
@@ -158,6 +167,28 @@ namespace MyNameSpace
     "timestamptz": "DateTimeOffset",
     "uuid": "GUID"
   }
+}
+~~~
+### sql模板
+#### mssql.json
+~~~
+{
+  "tablesql": "Select Name as tablename,'' as tabledescribe FROM SysObjects Where XType='U' ;",
+  "fieldsql": "SELECT a.name as fieldname,b.name as dbtype,case when a.xprec=0 then COLUMNPROPERTY(a.id,a.name,'PRECISION') else null end as fieldsize,isnull(g.[value],'') as fielddescribe FROM syscolumns a left join systypes b on a.xusertype=b.xusertype inner join sysobjects d on a.id=d.id  and d.xtype='U' and d.name<>'dtproperties' left join sys.extended_properties g on a.id=G.major_id and a.colid=g.minor_id where d.name='${tableName}'"
+}
+~~~
+#### mysql.json
+~~~
+{
+  "tablesql": "select table_name as tablename,table_comment as tabledescribe from information_schema.tables where table_schema='${databasename}' and table_type='BASE TABLE';",
+  "fieldsql": "select character_maximum_length as fieldsize,column_name as fieldname,data_type as dbtype,column_comment as fielddescribe from information_schema.columns where table_name = '${tableName}' "
+}
+~~~
+#### postgresql.json
+~~~
+{
+  "tablesql": "select relname as tablename,cast(obj_description(relfilenode,'pg_class') as varchar) as tabledescribe from pg_class c where relname in (SELECT tablename FROM pg_tables WHERE tablename NOT LIKE 'pg%' AND tablename NOT LIKE 'sql_%');",
+  "fieldsql": "SELECT a.attname AS fieldname,t.typname AS dbtype,case when a.atttypmod=-1 then null else a.atttypmod end AS fieldsize, b.description AS fielddescribe FROM pg_class c, pg_attribute a    LEFT JOIN pg_description b    ON a.attrelid = b.objoid  AND a.attnum = b.objsubid, pg_type t WHERE c.relname = '${tableName}'    AND a.attnum > 0    AND a.attrelid = c.oid    AND a.atttypid = t.oid"
 }
 ~~~
 
