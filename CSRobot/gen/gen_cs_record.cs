@@ -11,8 +11,7 @@ namespace MyNameSpace
         $?{fielddescribe}/// <summary>
         $?{fielddescribe}/// ${fielddescribe}
         $?{fielddescribe}/// </summary>
-        $?{fieldsize}
-        [BField(Length=${fieldsize},Name="${fieldname}")]
+        $?{fieldsize}[BField(Length=${fieldsize},Name="${fieldname}")]
         public $map{dbtype} ${fieldname}
         { get; set; }
         ${Fields}
