@@ -169,6 +169,28 @@ namespace MyNameSpace
   }
 }
 ~~~
+### sql模板
+#### mssql.json
+~~~
+{
+  "tablesql": "Select Name as tablename,'' as tabledescribe FROM SysObjects Where XType='U' ;",
+  "fieldsql": "SELECT a.name as fieldname,b.name as dbtype,case when a.xprec=0 then COLUMNPROPERTY(a.id,a.name,'PRECISION') else null end as fieldsize,isnull(g.[value],'') as fielddescribe FROM syscolumns a left join systypes b on a.xusertype=b.xusertype inner join sysobjects d on a.id=d.id  and d.xtype='U' and d.name<>'dtproperties' left join sys.extended_properties g on a.id=G.major_id and a.colid=g.minor_id where d.name='${tableName}'"
+}
+~~~
+#### mysql.json
+~~~
+{
+  "tablesql": "select table_name as tablename,table_comment as tabledescribe from information_schema.tables where table_schema='${databasename}' and table_type='BASE TABLE';",
+  "fieldsql": "select character_maximum_length as fieldsize,column_name as fieldname,data_type as dbtype,column_comment as fielddescribe from information_schema.columns where table_name = '${tableName}' "
+}
+~~~
+#### postgresql.json
+~~~
+{
+  "tablesql": "select relname as tablename,cast(obj_description(relfilenode,'pg_class') as varchar) as tabledescribe from pg_class c where relname in (SELECT tablename FROM pg_tables WHERE tablename NOT LIKE 'pg%' AND tablename NOT LIKE 'sql_%');",
+  "fieldsql": "SELECT a.attname AS fieldname,t.typname AS dbtype,case when a.atttypmod=-1 then null else a.atttypmod end AS fieldsize, b.description AS fielddescribe FROM pg_class c, pg_attribute a    LEFT JOIN pg_description b    ON a.attrelid = b.objoid  AND a.attnum = b.objsubid, pg_type t WHERE c.relname = '${tableName}'    AND a.attnum > 0    AND a.attrelid = c.oid    AND a.atttypid = t.oid"
+}
+~~~
 
 ## 案例
 从MySql库生成实体类
