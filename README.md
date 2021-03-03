@@ -51,7 +51,7 @@ namespace MyNameSpace
 }
 ~~~
 ### map
-下面例子是MS SqlServer与csharp的类型映射
+下面例子是DB与c#的类型映射
 ~~~ json
 {
   "mssql-cs": {
