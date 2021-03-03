@@ -26,10 +26,10 @@ namespace CSRobot
             //CSRobot gen -dbtype=mysql -to=cs -out=c:/abc
 
             //mysql 
-            //  args = new string[] { "gen", "--dbtype=mysql", "--to=cs", "--tep=https://raw.githubusercontent.com/axzxs2001/CSRobot/main/CSRobot/gen/gen_cs_record.cs", "--table=account",  "--host=127.0.01","--db=testdb","--user=root","--pwd=gsw2021", "--port=3306" };
+            //  args = new string[] { "gen", "--dbtype=mysql","--tep=https://raw.githubusercontent.com/axzxs2001/CSRobot/main/CSRobot/gen/gen_cs_record.cs", "--table=account",  "--host=127.0.01","--db=testdb","--user=root","--pwd=gsw2021", "--port=3306" };
 
             //postgres
-            args = new string[] { "gen", "--dbtype=postgresql", "--to=cs", "--tep=https://raw.githubusercontent.com/axzxs2001/CSRobot/main/CSRobot/gen/gen_cs_record.cs", "--host=127.0.01", @"--sql=C:\MyFile\Source\Repos\axzxs2001\CSRobot\CSRobot\gen\pgsql.json", "--db=stealthdb", "--user=postgres", "--pwd=postgres2018" };
+            args = new string[] { "gen", "--dbtype=postgresql", @"--map=C:\MyFile\Source\Repos\axzxs2001\CSRobot\CSRobot\gen\map.json", "--tep=https://raw.githubusercontent.com/axzxs2001/CSRobot/main/CSRobot/gen/gen_cs_record.cs", "--host=127.0.01", @"--sql=C:\MyFile\Source\Repos\axzxs2001\CSRobot\CSRobot\gen\pgsql.json", "--db=stealthdb", "--user=postgres", "--pwd=postgres2018" };
             //mssql
             //args = new string[] { "gen", "--dbtype=mysql", @"--map=C:\MyFile\Source\Repos\axzxs2001\CSRobot\CSRobot\gen\map.json",@"--sql=C:\MyFile\Source\Repos\axzxs2001\CSRobot\CSRobot\gen\mysql.json", "--host=127.0.0.1", "--db=marsdb", "--user=root", "--pwd=mars2020" };
 
