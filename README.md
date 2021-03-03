@@ -32,7 +32,7 @@ Nuget地址：
 ~~~ C#
 using System;
 
-namespace ${DataBaseName }
+namespace MyNameSpace
 {
     /// <summary>
     /// ${TableDescribe}
