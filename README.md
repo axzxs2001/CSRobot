@@ -54,7 +54,7 @@ namespace MyNameSpace
 下面例子是MS SqlServer与csharp的类型映射
 ~~~ json
 {
-"mssql-cs": {
+  "mssql-cs": {
     "bigint": "long",
     "binary": "Byte[]",
     "bit": "bool",
@@ -85,6 +85,44 @@ namespace MyNameSpace
     "varbinary": "Byte[]",
     "varchar": "string",
     "xml": "string"
+  },
+  "postgresql-cs": {
+    "bigint": "long",
+    "int8": "long",
+    "bigserial": "long",
+    "serial8": "long",
+    "boolean": "bool",
+    "bool": "bool",
+    "bytea": "Byte[]",
+    "character": "string",
+    "char": "string",
+    "character varying": "string",
+    "varchar": "string",
+    "date": "DateTime",
+    "double precision": "double",
+    "float8": "double",
+    "integer": "int",
+    "int4": "int",
+    "interval": "string",
+    "money": "decimal",
+    "numeric": "decimal",
+    "decimal": "decimal",
+    "real": "float",
+    "float4": "float",
+    "smallint": "short",
+    "int2": "short",
+    "smallserial": "short",
+    "serial2": "short",
+    "serial": "int",
+    "serial4": "int",
+    "text": "string",
+    "time": "DateTime",
+    "time with time zone": "DateTimeOffset",
+    "timetz": "DateTimeOffset",
+    "timestamp": "DateTime",
+    "timestamp with time zone": "DateTimeOffset",
+    "timestamptz": "DateTimeOffset",
+    "uuid": "GUID"
   }
 }
 ~~~
