@@ -1,0 +1,4 @@
+{
+  "tablesql": "select relname as tablename,cast(obj_description(relfilenode,'pg_class') as varchar) as tabledescribe from pg_class c where relname in (SELECT tablename FROM pg_tables WHERE tablename NOT LIKE 'pg%' AND tablename NOT LIKE 'sql_%');",
+  "fieldsql": "SELECT a.attname AS fieldname,t.typname AS dbtype,case when a.atttypmod=-1 then null else a.atttypmod end AS fieldsize, b.description AS fielddescribe FROM pg_class c, pg_attribute a    LEFT JOIN pg_description b    ON a.attrelid = b.objoid  AND a.attnum = b.objsubid, pg_type t WHERE c.relname = '${tableName}'    AND a.attnum > 0    AND a.attrelid = c.oid    AND a.atttypid = t.oid"
+}

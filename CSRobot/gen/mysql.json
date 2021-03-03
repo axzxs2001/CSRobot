@@ -1,0 +1,4 @@
+{
+  "tablesql": "select table_name as tablename,table_comment as tabledescribe from information_schema.tables where table_schema='${databasename}' and table_type='BASE TABLE';",
+  "fieldsql": "select character_maximum_length as fieldsize,column_name as fieldname,data_type as dbtype,column_comment as fielddescribe from information_schema.columns where table_name = '${tableName}' "
+}

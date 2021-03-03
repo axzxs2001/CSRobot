@@ -29,11 +29,12 @@ namespace CSRobot
             //  args = new string[] { "gen", "--dbtype=mysql", "--to=cs", "--tep=https://raw.githubusercontent.com/axzxs2001/CSRobot/main/CSRobot/gen/gen_cs_record.cs", "--table=account",  "--host=127.0.01","--db=testdb","--user=root","--pwd=gsw2021", "--port=3306" };
 
             //postgres
-            //args = new string[] { "gen", "--dbtype=postgresql", "--to=cs", "--tep=https://raw.githubusercontent.com/axzxs2001/CSRobot/main/CSRobot/gen/gen_cs_record.cs",  "--host=127.0.01", "--db=stealthdb", "--user=postgres","--pwd=postgres2018" };
+            args = new string[] { "gen", "--dbtype=postgresql", "--to=cs", "--tep=https://raw.githubusercontent.com/axzxs2001/CSRobot/main/CSRobot/gen/gen_cs_record.cs", "--host=127.0.01", @"--sql=C:\MyFile\Source\Repos\axzxs2001\CSRobot\CSRobot\gen\pgsql.json", "--db=stealthdb", "--user=postgres", "--pwd=postgres2018" };
             //mssql
-            args = new string[] { "gen", "--dbtype=postgresql", @"--map=C:\MyFile\Source\Repos\axzxs2001\CSRobot\CSRobot\gen\map.json", "--host=127.0.0.1", "--db=StarPayAgent", "--user=postgres", "--pwd=postgres2018" };
+            //args = new string[] { "gen", "--dbtype=mysql", @"--map=C:\MyFile\Source\Repos\axzxs2001\CSRobot\CSRobot\gen\map.json",@"--sql=C:\MyFile\Source\Repos\axzxs2001\CSRobot\CSRobot\gen\mysql.json", "--host=127.0.0.1", "--db=marsdb", "--user=root", "--pwd=mars2020" };
+
             //appsettings
-            // args = new string[] { "gen", "--dbtype=mssql", "--to=cs", "--tep=https://raw.githubusercontent.com/axzxs2001/CSRobot/main/CSRobot/gen/gen_cs_record.cs", "--db=stealthdb", "--user=sa", "--pwd=sa" };
+            // args = new string[] { "gen", "--dbtype=mssql", "--to=cs", "--tep=https://raw.githubusercontent.com/axzxs2001/CSRobot/main/CSRobot/gen/gen_cs_record.cs", "--db=StarPay_Test_Reconcile", "--user=liu", "--pwd=sa" };
 
             // args = new string[] { "gen", "-h" };
             // args = new string[] { "-info" };
@@ -49,7 +50,7 @@ namespace CSRobot
     }
     static class CSRobotTools
     {
-        static Dictionary<string, Func<CommandOptions, bool>> _CSRobotDic;
+        static readonly Dictionary<string, Func<CommandOptions, bool>> _CSRobotDic;
         static CSRobotTools()
         {
             _CSRobotDic = new Dictionary<string, Func<CommandOptions, bool>> {

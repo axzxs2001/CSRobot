@@ -29,16 +29,15 @@ namespace CSRobot.GenerateEntityTools
             }
 
             ITraverser traverser = null;
-            IBuilder builder = null;
             if (options.ContainsKey("--dbtype"))
             {
                 switch (options["--dbtype"].ToLower())
                 {
                     case "mysql":
-                       // traverser = new MySqlTraverser(options);
+                        traverser = new MySqlTraverser(options);
                         break;
                     case "mssql":
-                       // traverser = new MsSqlTraverser(options);
+                        traverser = new MsSqlTraverser(options);
                         break;
                     case "postgresql":
                         traverser = new PostgreSqlTraverser(options);
@@ -51,8 +50,7 @@ namespace CSRobot.GenerateEntityTools
                 return false;
             }
 
-            builder = new CSharpBuilder();
-
+            IBuilder builder = new CSharpBuilder();
             if (traverser != null && builder != null)
             {
                 builder.Build(traverser.Traverse(), options);

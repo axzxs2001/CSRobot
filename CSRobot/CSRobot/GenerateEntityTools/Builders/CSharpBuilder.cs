@@ -19,19 +19,19 @@ namespace CSRobot.GenerateEntityTools.Builders
         public void Build(DataBase database, CommandOptions options)
         {
             //取输出路径
-            var basePath = GetOut(options, database.DataBaseName);
+            var basePath = GetOut(options);
 
-            var template = GetTamplate(options);
+            var (Template, Extension) = GetTamplate(options);
 
-            _typeMap = GetMapTypes(options)[$"{options["--dbtype"].ToLower()}-{template.Extension.TrimStart('.')}"];
+            _typeMap = GetMapTypes(options)[$"{options["--dbtype"].ToLower()}-{Extension.TrimStart('.')}"];
             //生成独立的表
             if (options.ContainsKey("--table"))
             {
                 var table = database.Tables.SingleOrDefault(s => s["tablename"].ToString() == options["--table"]);
                 if (table != null)
                 {
-                    var codeString = GetCodeString(database.DataBaseName, table, template.Template);
-                    File.WriteAllText($"{basePath}/{table["tablename"]}{template.Extension}", codeString.ToString(), Encoding.UTF8);
+                    var codeString = GetCodeString(table, Template);
+                    File.WriteAllText($"{basePath}/{table["tablename"]}{Extension}", codeString.ToString(), Encoding.UTF8);
                 }
                 else
                 {
@@ -43,7 +43,7 @@ namespace CSRobot.GenerateEntityTools.Builders
                 //生成所有表实体类
                 foreach (var table in database.Tables)
                 {
-                    var filePath = $"{basePath}/{table["tablename"]}{template.Extension}";
+                    var filePath = $"{basePath}/{table["tablename"]}{Extension}";
                     if (File.Exists(filePath))
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
@@ -53,13 +53,13 @@ namespace CSRobot.GenerateEntityTools.Builders
                         Console.WriteLine("覆盖请按 Y(y)，否则请按其他键：");
                         if (Console.ReadLine().ToLower() == "y")
                         {
-                            var codeString = GetCodeString(database.DataBaseName, table, template.Template);
+                            var codeString = GetCodeString(table, Template);
                             File.WriteAllText(filePath, codeString.ToString(), Encoding.UTF8);
                         }
                     }
                     else
                     {
-                        var codeString = GetCodeString(database.DataBaseName, table, template.Template);
+                        var codeString = GetCodeString(table, Template);
                         File.WriteAllText(filePath, codeString.ToString(), Encoding.UTF8);
                     }
                 }
@@ -72,7 +72,7 @@ namespace CSRobot.GenerateEntityTools.Builders
         /// <param name="table"></param>
         /// <param name="template"></param>
         /// <returns></returns>
-        private string GetCodeString(string dataBaseName, Dictionary<string, object> table, string template)
+        private string GetCodeString(Dictionary<string, object> table, string template)
         {
 
             var matchs = Regex.Matches(template, @"(?<=\$\{)[\w]+(?=\})");
@@ -84,20 +84,14 @@ namespace CSRobot.GenerateEntityTools.Builders
                 }
                 if (table.ContainsKey(item.Value))
                 {
-                    template = template.Replace($"${{{item.Value}}}", table[item.Value].ToString());
+                    template = template.Replace($"${{{item.Value}}}", table[item.Value].ToString(), StringComparison.OrdinalIgnoreCase);
                 }
-                // Console.WriteLine(item.Value);
             }
-
-            //template = template.Replace("${DataBaseName}", dataBaseName);
-            //template = template.Replace("${TableDescribe}", table.TableDescribe);
-            //template = template.Replace("${TableName}", table.TableName);
-
             var match = Regex.Match(template, @"(?<=\$\{Fields\})[\w\W]+(?=\$\{Fields\})");
             if (match.Success)
             {
                 var reg = new Regex(@"(?<=\$\{Fields\})[\w\W]+(?=\$\{Fields\})");
-                return reg.Replace(template, GetFieldString(table, match.Value.Trim(' ')).Trim()).Replace("${Fields}", "");
+                return reg.Replace(template, GetFieldString(table, match.Value.Trim(' ')).Trim()).Replace("${Fields}", "", StringComparison.OrdinalIgnoreCase);
             }
             return template;
         }
@@ -110,9 +104,9 @@ namespace CSRobot.GenerateEntityTools.Builders
         /// <returns></returns>
         private string GetFieldString(Dictionary<string, object> table, string fieldTamplate)
         {
-            var fields = new StringBuilder();
+            var fieldBuild = new StringBuilder();
 
-            foreach (var field in table["fields"] as IEnumerable<Dictionary<string, object>>)
+            foreach (var fields in table["fields"] as IEnumerable<Dictionary<string, object>>)
             {
                 //把模板分成行，分别处理
                 var lines = fieldTamplate.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
@@ -126,11 +120,10 @@ namespace CSRobot.GenerateEntityTools.Builders
                         var match = Regex.Match(newLine, @"(?<=\$\?\{)[\w]+(?=\})");
                         if (match.Success)
                         {
-                            //todo 这里要变
-                            var valueResult = field.GetType().GetProperty(match.Value).GetValue(field);
+                            var valueResult = fields[match.Value.ToLower()];
                             if (valueResult != null && valueResult.ToString() != "")
                             {
-                                newLine = newLine.Replace($"$?{{{match.Value}}}", "");
+                                newLine = newLine.Replace($"$?{{{match.Value}}}", "", StringComparison.OrdinalIgnoreCase);
                                 newFieldTamplate.AppendLine(newLine);
                             }
                         }
@@ -141,29 +134,35 @@ namespace CSRobot.GenerateEntityTools.Builders
                     }
                 }
                 var fieldContent = newFieldTamplate.ToString();
-                foreach (var pro in field.GetType().GetProperties())
+                foreach (var field in fields)
                 {
-                    //todo 这里要变
-                    if (pro.Name != "DBType")
+                    var match = Regex.Match(fieldContent, @"(?<=\$map\{)[\w]+(?=\})");
+                    if (match.Success && match.Value == field.Key)
                     {
-                        fieldContent = fieldContent.Replace($"${{{pro.Name}}}", pro.GetValue(field)?.ToString());
+                        if (_typeMap.ContainsKey(field.Value.ToString()))
+                        {
+                            fieldContent = fieldContent.Replace($"$map{{{field.Key}}}", _typeMap[field.Value.ToString()], StringComparison.OrdinalIgnoreCase);
+                        }
+                        else
+                        {
+                            fieldContent = fieldContent.Replace($"$map{{{field.Key}}}", "object", StringComparison.OrdinalIgnoreCase);
+                        }
                     }
                     else
                     {
-                        fieldContent = fieldContent.Replace("${DBType}", _typeMap[field["DBType"].ToString()]);
+                        fieldContent = fieldContent.Replace($"${{{field.Key}}}", field.Value.ToString(), StringComparison.OrdinalIgnoreCase);
                     }
                 }
-                fields.AppendLine(fieldContent);
+                fieldBuild.AppendLine(fieldContent);
             }
-            return fields.ToString();
+            return fieldBuild.ToString();
         }
         /// <summary>
         /// 处理输出路径
         /// </summary>
         /// <param name="options"></param>
-        /// <param name="dataBaseName"></param>
         /// <returns></returns>
-        private string GetOut(CommandOptions options, string dataBaseName)
+        private static string GetOut(CommandOptions options)
         {
             if (options.ContainsKey("--out"))
             {
@@ -171,7 +170,7 @@ namespace CSRobot.GenerateEntityTools.Builders
             }
             else
             {
-                var basePath = $"{Directory.GetCurrentDirectory()}/{dataBaseName}";
+                var basePath = $"{Directory.GetCurrentDirectory()}/entities";
                 Directory.CreateDirectory(basePath);
                 return basePath;
             }
@@ -181,24 +180,24 @@ namespace CSRobot.GenerateEntityTools.Builders
         /// </summary>
         /// <param name="options"></param>
         /// <returns></returns>
-        private (string Template, string Extension) GetTamplate(CommandOptions options)
+        private static (string Template, string Extension) GetTamplate(CommandOptions options)
         {
             var template = @"
 using System;
 
-namespace ${DataBaseName}
+namespace MyNameSpace
 {
     /// <summary>
-    /// ${TableDescribe}
+    /// ${tabledescribe}
     /// </summary>
-    public class ${TableName}
+    public class ${tablename}
     {
         ${Fields}
-        $?{FieldDescribe}/// <summary>
-        $?{FieldDescribe}/// ${FieldDescribe}
-        $?{FieldDescribe}/// </summary>
-        $?{FieldSize}[BField(Length=${FieldSize},Name=""${FieldName}"")]
-        public ${DBType} ${FieldName}
+        $?{fielddescribe}/// <summary>
+        $?{fielddescribe}/// ${fielddescribe}
+        $?{fielddescribe}/// </summary>
+        $?{fieldsize}[BField(Length=${fieldsize},Name=""${fieldname}"")]
+        public $map{dbtype} ${fieldname}
         { get; set; }
         ${Fields}
     }
@@ -206,7 +205,7 @@ namespace ${DataBaseName}
 ";
             if (options.ContainsKey("--tep"))
             {
-                var path = options["--tep"].ToLower();
+                var path = options["--tep"];
                 if (path == "cs")
                 {
                     return (template, ".cs");
@@ -240,7 +239,7 @@ namespace ${DataBaseName}
 
 
 
-        private Dictionary<string, Dictionary<string, string>> GetMapTypes(CommandOptions options)
+        private static Dictionary<string, Dictionary<string, string>> GetMapTypes(CommandOptions options)
         {
             if (options.ContainsKey("--map"))
             {
@@ -270,92 +269,112 @@ namespace ${DataBaseName}
             {
                 var typeMap = new Dictionary<string, Dictionary<string, string>>()
                 {
-                    {"PostgreSqlToCS",new Dictionary<string, string>
+                    {"postgresql-cs",new Dictionary<string, string>
                     {
-                        {"bigint","long" },
-                        {"bigserial" ,"long" },
-                        {"bit","bool" },
-                        {"boolean","bool" },
-                        {"bool","bool" },
-                        {"character","string" },
-                        {"cidr","string" },
-                        {"date","DateTime" }  ,
-                        {"double","double" }  ,
-                        {"inet","string" }  ,
-                        {"int4","int" } ,
-                        {"integer","int" } ,
-                        {"macaddr","string" } ,
-                        {"money","decimal" },
-                        {"numeric","decimal" } ,
-                        {"real","float" },
-                        {"smallint","short" },
-                        {"smallserial","short" },
-                        {"serial","int" },
-                        {"text","string" },
-                        {"varchar","string" },
-                        {"time","DateTime" } ,
-                        {"timestamp","DateTime" },
-                        {"tsquery","string" },
-                        {"tsvector","string" },
-                        {"txid_snapshot","string" },
-                        {"uuid","string" } ,
-                        {"xml","string" } ,
-                        {"json","string" },
+                        {"bigint","long"},
+                        {"int8","long"},
+                        {"bigserial","long"},
+                        {"serial8","long"},
+                        {"boolean","bool"},
+                        {"bool","bool"},
+                        {"bytea","Byte[]"},
+                        {"character","string"},
+                        {"char","string"},
+                        {"character varying","string"},
+                        {"varchar","string"},
+                        {"date","DateTime"},
+                        {"double precision","double"},
+                        {"float8","double"},
+                        {"integer","int"},
+                        {"int4","int"},
+                        {"interval","string"},
+                        {"money","decimal"},
+                        {"numeric","decimal"},
+                        {"decimal","decimal"},
+                        {"real","float"},
+                        {"float4","float"},
+                        {"smallint","short"},
+                        {"int2","short"},
+                        {"smallserial","short"},
+                        {"serial2","short"},
+                        {"serial","int"},
+                        {"serial4","int"},
+                        {"text","string"},
+                        {"time","DateTime"},
+                        {"time with time zone","DateTimeOffset"},
+                        {"timetz","DateTimeOffset"},
+                        {"timestamp","DateTime"},
+                        {"timestamp with time zone","DateTimeOffset"},
+                        {"timestamptz","DateTimeOffset"},
+                        {"uuid","GUID"}
                     }},
-                    {"MySqlToCS",new Dictionary<string, string>
+                    {"mysql-cs",new Dictionary<string, string>
                     {
-                        {"char","char" },
-                        {"varchar","string" },
-                        {"tinytext","string" },
-                        {"text","string" },
-                        {"blob","string" },
-                        {"mediumtext","string" },
-                        {"mediumblob","string" },
-                        {"longblob","string" },
-                        {"longtext","string" },
-                        {"tinyint","short" },
-                        {"smallint","short" },
-                        {"mediumint","short" },
-                        {"int","int" },
+                        {"char","string"},
+                        {"varchar","string"},
+                        {"binary","byte[]"},
+                        {"varbinary","byte[]"},
+                        {"tinyblob","btye[]"},
+                        {"tinytext","string"},
+                        {"text","string"},
+                        {"blob","byte[]"},
+                        {"mediumtext","string"},
+                        {"mediumblob","byte[]"},
+                        {"longtext","string"},
+                        {"longblob","byte[]"},
+                        {"enum","string"},
+                        {"bit","short"},
+                        {"tinyint","byte"},
+                        {"bool","bool"},
+                        {"boolean","bool"},
+                        {"smallint","short"},
+                        {"mediumint","short"},
+                        {"int","int32"},
+                        {"integer","int32"},
+                        {"bigint","long"},
+                        {"float","float"},                      
+                        {"double","double"},
+                        {"double precision","double"},
+                        {"decimal","decimal"},
+                        {"dec","decimal"},
+                        {"date","datetime"},
+                        {"datetime","datetime"},
+                        {"timestamp","datetime"},
+                        {"time","datetime"},
+                        {"year","short"}
+                    }},
+                    {"mssql-cs", new Dictionary<string, string>
+                    {
                         {"bigint","long" },
-                        {"float","float" },
-                        {"double","double" },
-                        {"decimal","decimal" },
+                        {"binary","Byte[]" },
+                        {"bit","bool" },
+                        {"char","string" },
                         {"date","DateTime" },
                         {"datetime","DateTime" },
-                        {"timestamp","string" },
-                        {"time","DateTime" },
-                        {"boolean","bool" },
-                    }},
-                    {"MsSqlToCS", new Dictionary<string, string>
-                    {
-                        { "char", "string" },
-                        { "varchar", "string" },
-                        { "text", "string" },
-                        { "nchar", "string" },
-                        { "nvarchar", "string" },
-                        { "ntext", "string" },
-                        { "bit", "bool" },
-                        { "binary", "string" },
-                        { "varbinary", "string" },
-                        { "image", "string" },
-                        { "tinyint", "byte" },
-                        { "smallint", "short" },
-                        { "int", "int" },
-                        { "bigint", "long" },
-                        { "decimal", "decimal" },
-                        { "numeric", "decimal" },
-                        { "smallmoney", "decimal" },
-                        { "money", "decimal" },
-                        { "float", "float" },
-                        { "real", "double" },
-                        { "datetime", "DateTime" },
-                        { "datetime2", "DateTime" },
-                        { "smalldatetime", "DateTime" },
-                        { "date", "DateTime" },
-                        { "time", "DateTime" },
-                        { "datetimeoffset", "string" },
-                        { "timestamp", "string" }
+                        {"datetime2","DateTime" },
+                        {"datetimeoffset","DateTimeOffset" },
+                        {"decimal", "decimal" },
+                        {"float","double" },
+                        {"image","Byte[]" },
+                        {"int","int" },
+                        {"money","decimal" },
+                        {"nchar","string" },
+                        {"ntext","string" },
+                        {"numeric","double" },
+                        {"nvarchar","string" },
+                        {"real","float" },
+                        {"rowversion","Byte[]" },
+                        {"smalldatetime","DateTime" },
+                        {"smallint","short" },
+                        {"smallmoney","decimal" },
+                        {"text","string" },
+                        {"time","TimeSpan" },
+                        {"timestamp","Byte[]" },
+                        {"tinyint","Byte" },
+                        {"uniqueidentifier","Guid" },
+                        {"varbinary","Byte[]" },
+                        {"varchar","string" },
+                        {"xml","string" }
                     }}
                 };
                 return typeMap;
@@ -363,4 +382,5 @@ namespace ${DataBaseName}
         }
 
     }
+
 }
