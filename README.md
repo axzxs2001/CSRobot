@@ -2,12 +2,15 @@
 
 <img src="https://github.com/axzxs2001/CSRobot/blob/main/csrobot.png" width="120"/>
 
+ ## csrobot为开发提高效率，增加乐趣！
 
 安装命令：
 >dotnet tool install --global CSRobot --version 0.0.3
 
 Nuget地址：https://www.nuget.org/packages/CSRobot/  
  
+
+ ## 一、gen
  **csrobot gen是什么？**  
  gen是完成从数据库表结构生成实体类的小工具，其工作原理是
 1. 按照--sql指定的sql模板或内置的sql语句查询库中的表信息，表中字段信息
