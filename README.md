@@ -27,7 +27,7 @@ Nuget地址：https://www.nuget.org/packages/CSRobot/
 |--table	|指定特定的表名生成实体类，缺省默认生成全部库表|
 |--out,--o	| 生成实体类的路径，缺省默认输出文件到当前路径下entities目录中|
 |--tep  <img width=250/>	|生成实体类的模板，可以是内置的模板cs，或指定本地路径，或指定url，生成文件的扩展名与指定的模板扩展名匹配。缺省默认cs内置模板，例如:--tep=/usr/abc/bcd.cs；--tep=https://github.com/abc/bcd.cs；--tep=cs|
-|--sql|查询表结构的sql语句，模板有两个属性：tablesql是查询库中全部表的信息，表名必需用tablename命名，fieldsql是查询tablename表中的全部字段，这里两个sql的字段除了tablename都可以自定义，在--tep模板中应用，例如:--sql=/usr/abc/mssql-cs.sql；--map=https://github.com/axzxs2001/CSRobot/blob/main/CSRobot/gen/mssql-cs.sql|
+|--sql|查询表结构的sql语句，模板有两个属性：tablesql是查询库中全部表的信息，表名必须用tablename命名，fieldsql是查询tablename表中的全部字段，这里两个sql的字段除了tablename都可以自定义，在--tep模板中应用，例如:--sql=/usr/abc/mssql-cs.sql；--map=https://github.com/axzxs2001/CSRobot/blob/main/CSRobot/gen/mssql-cs.sql|
 |--map|生成实体类字段时，数据库到实体类的字段映射模板，缺省值为内置的模板，或指定本地路径，或指定url，例如:--map=/usr/abc/bcd.json；--map=https://github.com/axzxs2001/CSRobot/blob/main/CSRobot/gen/map.json|
 |--host |	连接数据所在主机，如果缺少此项，会查找--constr,或查找当前目录或子目录中的是否存在appsettings.json配置文件，并取配置文件下的ConnectionStrings节点的第一个子节点的值作为连接字符串|
 |--db |	数据库名称，如果缺少此项，会查找--constr,或查找当前目录或子目录中的是否存在appsettings.json配置文件，并取配置文件下的ConnectionStrings节点的第一个子节点的值作为连接字符串|
@@ -38,7 +38,7 @@ Nuget地址：https://www.nuget.org/packages/CSRobot/
 
 **说明：** 
 *如果连接字符串属性同时出现，--constr优先级最高，其次是--host,--db,--user,--pwd,--port组，两者都不存在再查询appsettings.json*  
-*模板文件夹：https://github.com/axzxs2001/CSRobot/tree/main/CSRobot/gen，包含实体类模板，数据库到实体类型映身模板，查询表结构sql语句模板*
+*模板文件夹：https://github.com/axzxs2001/CSRobot/tree/main/CSRobot/gen，包含实体类模板，数据库到实体类型映射模板，查询表结构sql语句模板*
 
 ### --tep
 如果生成的实体是cs的，模板文件的扩展名为.cs,内容如下例，
