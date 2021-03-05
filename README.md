@@ -8,7 +8,7 @@
 
 Nuget地址：https://www.nuget.org/packages/CSRobot/  
  
- **重点说明：**  
+ **csrobot gen是什么？**  
  gen是完成从数据库表结构生成实体类的小工具，其工作原理是
 1. 按照--sql指定的sql模板或内置的sql语句查询库中的全部表信息，表中全部字段信息
 2. 按照--map配置库和实体类的映射关系
