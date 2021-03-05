@@ -5,7 +5,7 @@
  ## csrobot为开发提高效率，增加乐趣！
 
 安装命令：
->dotnet tool install --global CSRobot --version 0.0.3
+>dotnet tool install --global CSRobot --version 0.0.4
 
 Nuget地址：https://www.nuget.org/packages/CSRobot/  
  
