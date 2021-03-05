@@ -24,7 +24,6 @@ Nuget地址：https://www.nuget.org/packages/CSRobot/
 |参数选项|描述|
 | ---------------- | :-----------  | 
 |--dbtype|数据库类型，必填，例如:--dbtype=mysql,--dbtype=mssql,--dbtype=postgressql|
-|--table	|指定特定的表名生成实体类，缺省默认生成全部库表|
 |--out,--o	| 生成实体类的路径，缺省默认输出文件到当前路径下entities目录中|
 |--tep  <img width=250/>	|生成实体类的模板，可以是内置的模板cs，或指定本地路径，或指定url，生成文件的扩展名与指定的模板扩展名匹配。缺省默认cs内置模板，例如:--tep=/usr/abc/bcd.cs；--tep=https://github.com/abc/bcd.cs；--tep=cs|
 |--sql|查询表结构的sql语句，模板有两个属性：tablesql是查询库中全部表的信息，表名必须用tablename命名，fieldsql是查询tablename表中的全部字段，这里两个sql的字段除了tablename都可以自定义，在--tep模板中应用，例如:--sql=/usr/abc/mssql-cs.sql；--map=https://github.com/axzxs2001/CSRobot/blob/main/CSRobot/gen/mssql-cs.sql|
