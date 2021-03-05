@@ -12,30 +12,23 @@ namespace CSRobot.GenerateEntityTools.Traversers
     {
         protected bool IsExistOption { get; set; } = true;
 
+        protected string ConnectionString { get; set; }
         protected string FieldSQL { get; set; }
 
         protected string TableSQL { get; set; }
         public Traverser(CommandOptions options)
         {
-            if (!options.ContainsKey("--host"))
+
+            if (options.ContainsKey("--constr"))
             {
-                IsExistOption = false;
-                Console.WriteLine("缺少 --host");
+                ConnectionString = options["--constr"];
             }
-            if (!options.ContainsKey("--db"))
+            else
             {
-                IsExistOption = false;
-                Console.WriteLine("缺少 --db");
-            }
-            if (!options.ContainsKey("--user"))
-            {
-                IsExistOption = false;
-                Console.WriteLine("缺少 --user");
-            }
-            if (!options.ContainsKey("--pwd"))
-            {
-                IsExistOption = false;
-                Console.WriteLine("缺少 --pwd");
+                if (!options.ContainsKey("--host")||!options.ContainsKey("--db")||!options.ContainsKey("--user")||!options.ContainsKey("--pwd"))
+                {
+                    IsExistOption = false;                   
+                }
             }
             LoadSQL(options);
         }

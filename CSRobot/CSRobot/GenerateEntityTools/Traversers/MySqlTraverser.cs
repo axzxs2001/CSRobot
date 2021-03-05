@@ -11,7 +11,11 @@ namespace CSRobot.GenerateEntityTools.Traversers
         private readonly MySqlConnectionStringBuilder _connectionStringBuilder;
         public MySqlTraverser(CommandOptions options) : base(options)
         {
-            if (IsExistOption)
+            if (!string.IsNullOrEmpty(ConnectionString))
+            {
+                _connectionStringBuilder = new MySqlConnectionStringBuilder(ConnectionString);
+            }
+            else if (IsExistOption)
             {
                 _connectionStringBuilder = new MySqlConnectionStringBuilder()
                 {

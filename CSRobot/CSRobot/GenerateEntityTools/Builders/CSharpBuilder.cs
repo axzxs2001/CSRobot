@@ -170,9 +170,16 @@ namespace CSRobot.GenerateEntityTools.Builders
             }
             else
             {
-                var basePath = $"{Directory.GetCurrentDirectory()}/entities";
-                Directory.CreateDirectory(basePath);
-                return basePath;
+                if (options.ContainsKey("--o"))
+                {
+                    return options["--o"];
+                }
+                else
+                {
+                    var basePath = $"{Directory.GetCurrentDirectory()}/entities";
+                    Directory.CreateDirectory(basePath);
+                    return basePath;
+                }
             }
         }
         /// <summary>
@@ -195,8 +202,7 @@ namespace MyNameSpace
         ${Fields}
         $?{fielddescribe}/// <summary>
         $?{fielddescribe}/// ${fielddescribe}
-        $?{fielddescribe}/// </summary>
-        $?{fieldsize}[BField(Length=${fieldsize},Name=""${fieldname}"")]
+        $?{fielddescribe}/// </summary>  
         public $map{dbtype} ${fieldname}
         { get; set; }
         ${Fields}
@@ -332,7 +338,7 @@ namespace MyNameSpace
                         {"int","int32"},
                         {"integer","int32"},
                         {"bigint","long"},
-                        {"float","float"},                      
+                        {"float","float"},
                         {"double","double"},
                         {"double precision","double"},
                         {"decimal","decimal"},

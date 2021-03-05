@@ -13,7 +13,11 @@ namespace CSRobot.GenerateEntityTools.Traversers
 
         public PostgreSqlTraverser(CommandOptions options) : base(options)
         {
-            if (IsExistOption)
+            if (!string.IsNullOrEmpty(ConnectionString))
+            {
+                _connectionStringBuilder = new NpgsqlConnectionStringBuilder(ConnectionString);
+            }
+            else if (IsExistOption)
             {
                 _connectionStringBuilder = new NpgsqlConnectionStringBuilder()
                 {

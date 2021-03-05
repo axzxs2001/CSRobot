@@ -42,11 +42,14 @@ namespace CSRobot.GenerateEntityTools
                     case "postgresql":
                         traverser = new PostgreSqlTraverser(options);
                         break;
+                    default:
+                        Console.WriteLine("失败：\r\n目前只支持mysql,mssql,postgresql");
+                        return false;
                 }
             }
             else
             {
-                Console.WriteLine("--dbtype是必填参数");
+                FailedWriteLine("--dbtype是必填参数");
                 return false;
             }
 
@@ -54,14 +57,28 @@ namespace CSRobot.GenerateEntityTools
             if (traverser != null && builder != null)
             {
                 builder.Build(traverser.Traverse(), options);
-                Console.WriteLine("生成成功");
+
+                SuccessWriteLine("生成成功");
                 return true;
             }
             else
             {
-                Console.WriteLine("生成失败");
+                FailedWriteLine("生成失败");
                 return false;
             }
+        }
+
+        internal static void SuccessWriteLine(string content)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine(content);
+            Console.ResetColor();
+        }
+        internal static void FailedWriteLine(string content)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(content);
+            Console.ResetColor();
         }
     }
 }

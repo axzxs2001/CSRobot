@@ -12,7 +12,11 @@ namespace CSRobot.GenerateEntityTools.Traversers
         private readonly SqlConnectionStringBuilder _connectionStringBuilder;
         public MsSqlTraverser(CommandOptions options) : base(options)
         {
-            if (IsExistOption)
+            if (!string.IsNullOrEmpty(ConnectionString))
+            {
+                _connectionStringBuilder = new SqlConnectionStringBuilder(ConnectionString);
+            }
+            else if (IsExistOption)
             {
                 _connectionStringBuilder = new SqlConnectionStringBuilder()
                 {
@@ -86,7 +90,7 @@ namespace CSRobot.GenerateEntityTools.Traversers
                 inner join     sysobjects d on     a.id=d.id  and d.xtype='U' and  d.name<>'dtproperties'
                 left join sys.extended_properties   g on     a.id=G.major_id and a.colid=g.minor_id 
                 where  d.name='{tableName}'";
-                sql = string.IsNullOrEmpty(FieldSQL) ? sql : FieldSQL.Replace("${tablename}", tableName,StringComparison.OrdinalIgnoreCase);
+                sql = string.IsNullOrEmpty(FieldSQL) ? sql : FieldSQL.Replace("${tablename}", tableName, StringComparison.OrdinalIgnoreCase);
                 var cmd = new SqlCommand(sql, con);
                 con.Open();
                 var reader = cmd.ExecuteReader();
