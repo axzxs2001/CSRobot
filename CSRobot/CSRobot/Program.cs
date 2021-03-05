@@ -16,7 +16,7 @@ namespace CSRobot
         static void Main(string[] args)
         {
             try
-            {
+            {              
                 CSRobotTools.Run(args);
             }
             catch (Exception exc)
