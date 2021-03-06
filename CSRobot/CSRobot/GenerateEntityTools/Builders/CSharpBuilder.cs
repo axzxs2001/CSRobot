@@ -24,46 +24,31 @@ namespace CSRobot.GenerateEntityTools.Builders
             var (Template, Extension) = GetTamplate(options);
 
             _typeMap = GetMapTypes(options)[$"{options["--dbtype"].ToLower()}-{Extension.TrimStart('.')}"];
-            //生成独立的表
-            if (options.ContainsKey("--table"))
+       
+            //生成所有表实体类
+            foreach (var table in database.Tables)
             {
-                var table = database.Tables.SingleOrDefault(s => s["tablename"].ToString() == options["--table"]);
-                if (table != null)
+                var filePath = $"{basePath}/{table["tablename"]}{Extension}";
+                if (File.Exists(filePath))
                 {
-                    var codeString = GetCodeString(table, Template);
-                    File.WriteAllText($"{basePath}/{table["tablename"]}{Extension}", codeString.ToString(), Encoding.UTF8);
-                }
-                else
-                {
-                    throw new ApplicationException($"找不到{options["--table"]}表");
-                }
-            }
-            else
-            {
-                //生成所有表实体类
-                foreach (var table in database.Tables)
-                {
-                    var filePath = $"{basePath}/{table["tablename"]}{Extension}";
-                    if (File.Exists(filePath))
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine($"{filePath}已存在");
-                        Console.ResetColor();
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"{filePath}已存在");
+                    Console.ResetColor();
 
-                        Console.WriteLine("覆盖请按 Y(y)，否则请按其他键：");
-                        if (Console.ReadLine().ToLower() == "y")
-                        {
-                            var codeString = GetCodeString(table, Template);
-                            File.WriteAllText(filePath, codeString.ToString(), Encoding.UTF8);
-                        }
-                    }
-                    else
+                    Console.WriteLine("覆盖请按 Y(y)，否则请按其他键：");
+                    if (Console.ReadLine().ToLower() == "y")
                     {
                         var codeString = GetCodeString(table, Template);
                         File.WriteAllText(filePath, codeString.ToString(), Encoding.UTF8);
                     }
                 }
+                else
+                {
+                    var codeString = GetCodeString(table, Template);
+                    File.WriteAllText(filePath, codeString.ToString(), Encoding.UTF8);
+                }
             }
+
         }
         /// <summary>
         /// 模板替换

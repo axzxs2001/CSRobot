@@ -41,7 +41,7 @@ namespace CSRobot
             var options = GetOptions(args);
             if (args.Length == 0)
             {
-                return _CSRobotDic["--info"](options);
+                return _CSRobotDic["-info"](options);
             }
             else if (_CSRobotDic.ContainsKey(args[0]))
             {

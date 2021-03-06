@@ -132,14 +132,21 @@ csrobot -h</value>
   </data>
   <data name="csrobot-info" xml:space="preserve">
     <value>CSRobot v{0}
-----------------------------------------------
+------------------------------------------------
+      ______     ____        __          __ 
+     / ____/____/ __ \____  / /_  ____  / /_
+    / /   / ___/ /_/ / __ \/ __ \/ __ \/ __/
+   / /___(__  ) _, _/ /_/ / /_/ / /_/ / /_  
+   \____/____/_/ |_|\____/_.___/\____/\__/  
+                                         
+------------------------------------------------
 Description:
-    为更好的使用C#提供帮助。
+    csrobot为开发提高效率，增加乐趣。
 
 Usage:
     CSRobot [options] [command] [command-options] [arguments]
 
-----------------------------------------------</value>
+-----------------------------------------------</value>
   </data>
   <data name="demo" xml:space="preserve">
     <value>你好</value>
@@ -150,7 +157,6 @@ csrobot gen [options]
 
 命令参数选项：
 --dbtype        数据库类型，必填，例如:--dbtype=mysql,--dbtype=mssql,--dbtype=postgressql
---table         指定数据库表名生成实体类，缺省默认全部库表
 --out           生成实体类的路径，缺省默认输出文件到当前路径下entities目录中
 --o             --out别名
 --tep           生成实体类的模板，可以是内置的模板cs，或指定本地路径，或指定url，生成文件的扩展名与指定的方法匹配。缺省默认cs内置模板，例如:--tep=/usr/abc/bcd.cs；--tep=https://github.com/axzxs2001/CSRobot/blob/main/CSRobot/gen/gen_cs_record.cs；--tep=cs
