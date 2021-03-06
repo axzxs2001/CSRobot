@@ -3,6 +3,15 @@
 <img src="https://github.com/axzxs2001/CSRobot/blob/main/csrobot.png" width="120"/>
 
  ## csrobot为开发提高效率，增加乐趣！
+ 
+~~~
+   ______     ____        __          __ 
+  / ____/____/ __ \____  / /_  ____  / /_
+ / /   / ___/ /_/ / __ \/ __ \/ __ \/ __/
+/ /___(__  ) _, _/ /_/ / /_/ / /_/ / /_
+\____/____/_/ |_|\____/_.___/\____/\__/
+~~~                                         
+
 
 安装命令：
 >dotnet tool install --global CSRobot --version 0.0.4
