@@ -16,7 +16,8 @@ namespace CSRobot
         static void Main(string[] args)
         {
             try
-            {              
+            {
+                args = new string[] { "code", @"--dir=C:\MyFile\Source\Repos\CSRobot\CSRobot\CSRobot" };
                 CSRobotTools.Run(args);
             }
             catch (Exception exc)
@@ -33,7 +34,8 @@ namespace CSRobot
             _CSRobotDic = new Dictionary<string, Func<CommandOptions, bool>> {
             {"-info", Info},
             {"-h",Help},
-            {"gen",GenerateEntityTool.GenerateEntity}
+            {"gen",GenerateEntityTool.GenerateEntity},
+            {"code",CodeInfo.CodeInfo.ShowCodeInfo}
         };
         }
         public static bool Run(string[] args)
