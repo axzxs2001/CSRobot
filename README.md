@@ -14,7 +14,7 @@
 
 
 安装命令：
->dotnet tool install --global CSRobot --version 0.0.4
+>dotnet tool install --global CSRobot --version 0.0.5
 
 Nuget地址：https://www.nuget.org/packages/CSRobot/  
  
