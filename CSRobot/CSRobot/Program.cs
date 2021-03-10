@@ -17,7 +17,7 @@ namespace CSRobot
         {
             try
             {
-                args = new string[] { "code", @"--dir=C:\MyFile\Source\Repos\CSRobot\CSRobot\CSRobot" };
+                args = new string[] { "gen", @"-h"};
                 CSRobotTools.Run(args);
             }
             catch (Exception exc)
@@ -55,15 +55,13 @@ namespace CSRobot
             }
         }
         static bool Help(CommandOptions options)
-        {
-            var mgr = new ResourceManager("CSRobot.Resource.gen", Assembly.GetExecutingAssembly());
-            Console.WriteLine(mgr.GetString("csrobot-h"), Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion.ToString());
+        {          
+            Console.WriteLine(MessageHub.CSRobot["zh"]["csrobot-h"], Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion.ToString());
             return true;
         }
         static bool Info(CommandOptions options)
         {
-            var mgr = new ResourceManager("CSRobot.Resource.gen", Assembly.GetExecutingAssembly());
-            Console.WriteLine(mgr.GetString("csrobot-info"), Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion.ToString());
+            Console.WriteLine(MessageHub.CSRobot["zh"]["csrobot-info"], Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion.ToString());
             return true;
         }
         static CommandOptions GetOptions(string[] args)

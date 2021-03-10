@@ -14,10 +14,8 @@ namespace CSRobot.GenerateEntityTools
     {
         //todo 这里要实现多语言支持
         static bool GenHelp()
-        {
-            var mgr = new ResourceManager("CSRobot.Resource.gen", Assembly.GetExecutingAssembly());
-            // _culture = CultureInfo.GetCultureInfo("ja");
-            Console.WriteLine(mgr.GetString("gen-h"));
+        {           
+            Console.WriteLine(MessageHub.Gen["zh"]["gen-h"]);
             return true;
         }
         internal static bool GenerateEntity(CommandOptions options)
