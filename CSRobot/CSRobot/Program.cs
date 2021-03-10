@@ -16,8 +16,7 @@ namespace CSRobot
         static void Main(string[] args)
         {
             try
-            {
-                args = new string[] { "gen", @"-h"};
+            {               
                 CSRobotTools.Run(args);
             }
             catch (Exception exc)
