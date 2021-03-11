@@ -16,6 +16,8 @@
 安装命令：
 >dotnet tool install --global CSRobot --version 0.0.7
 
+**注：** mac下，如果报command not found:csrobot，请执行 export PATH='$HOME/.dotnet/tools:$PATH'  
+
 Nuget地址：https://www.nuget.org/packages/CSRobot/  
  
 
