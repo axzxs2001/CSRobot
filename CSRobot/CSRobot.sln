@@ -8,10 +8,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "gen", "gen", "{DD13421A-0496-4581-9869-9265E34DF7CB}"
 	ProjectSection(SolutionItems) = preProject
 		gen\gen_cs_record.cs = gen\gen_cs_record.cs
-		gen\map.json = gen\map.json
+		gen\maptocs.json = gen\maptocs.json
+		gen\maptogo.json = gen\maptogo.json
 		gen\mssql.json = gen\mssql.json
 		gen\mysql.json = gen\mysql.json
 		gen\postgresql.json = gen\postgresql.json
+		gen\viewmodel.go = gen\viewmodel.go
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSRobot", "CSRobot\CSRobot.csproj", "{2B13A3B6-B755-4B6A-BDA0-5FE1EF31D1B3}"

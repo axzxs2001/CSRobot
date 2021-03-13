@@ -1,4 +1,4 @@
-{
+﻿{
   "mssql-cs": {
     "bigint": "long",
     "binary": "Byte[]",
