@@ -16,7 +16,7 @@ namespace CSRobot
         static void Main(string[] args)
         {
             try
-            {               
+            {
                 CSRobotTools.Run(args);
             }
             catch (Exception exc)
@@ -72,7 +72,7 @@ namespace CSRobot
                 {
                     continue;
                 }
-                var arr = args[i].Split("=");
+                var arr = args[i].Split("=",2);
                 if (arr.Length < 2)
                 {
                     options.Add(arr[0], null);

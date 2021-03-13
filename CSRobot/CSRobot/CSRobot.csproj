@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 		<TargetFramework>net5.0</TargetFramework>
-		<Version>0.0.7</Version>
+		<Version>0.0.8</Version>
 
 		<PackAsTool>true</PackAsTool>
 		<ToolCommandName>CSRobot</ToolCommandName>
@@ -14,10 +14,10 @@
 		<Authors>guisuwei</Authors>
 		<Description>Help you generate code efficiently.</Description>
 		<PackageIcon>csrobot.png</PackageIcon>
-		<AssemblyVersion>0.0.7.0</AssemblyVersion>
+		<AssemblyVersion>0.0.8.0</AssemblyVersion>
 		<PackageProjectUrl>https://github.com/axzxs2001/CSRobot</PackageProjectUrl>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
-		<FileVersion>0.0.7.0</FileVersion>
+		<FileVersion>0.0.8.0</FileVersion>
 		<PackageIconUrl />
 	</PropertyGroup>
 
