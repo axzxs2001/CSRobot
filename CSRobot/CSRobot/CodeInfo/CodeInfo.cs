@@ -11,20 +11,25 @@ using System.Threading.Tasks;
 
 namespace CSRobot.CodeInfo
 {
+
     static class CodeInfo
     {
         internal static bool ShowCodeInfo(CommandOptions options)
         {
+            Console.WriteLine("Statistics ......");
             if (options.ContainsKey("--dir"))
             {
                 Detect(options["--dir"]);
+
             }
             else
             {
                 Detect(Directory.GetCurrentDirectory());
             }
+            Console.SetCursorPosition(Console.CursorLeft, 0);
+            Console.CursorVisible = true;
+            ShowHotBlock();
             ShowTable();
-            ShowHotMap();
             return true;
         }
         #region 获取数据
@@ -124,190 +129,94 @@ namespace CSRobot.CodeInfo
         /// </summary>
         static void ShowTable()
         {
-            Console.BackgroundColor = ConsoleColor.Black;
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("┌────────────────────┬────────────────────┬────────────────────┬────────────────────┐ ");
-            Console.WriteLine("│     Extension      │      File Count    │     Line Count     │      Legend        │ ");
-            Console.WriteLine("├────────────────────┼────────────────────┼────────────────────┼────────────────────┤ ");
+            Console.WriteLine("File and content line statistics");
+            Console.WriteLine("┌────────────────────┬────────────────┬─────────────────┬────────────────┬─────────────────┬────────────┐ ");
+            Console.WriteLine("│   Extension        │   File Count   │ File Percentage │   Line Count   │ Line Percentage │  Legend    │ ");
+            Console.WriteLine("├────────────────────┼────────────────┼─────────────────┼────────────────┼─────────────────┼────────────┤ ");
             var i = 0;
             foreach (var mes in _fileDir)
             {
-                Console.Write("│");
-                Console.Write($" {mes.Key}".PadRight(20));
-                Console.Write($"│ {mes.Value.Count}".PadRight(21));
-                Console.Write($"│ {mes.Value.LineCount}".PadRight(21));
-                Console.Write($"│         ");
-                Console.ForegroundColor = _colorArr[((i+1) % _colorArr.Length)];
-                Console.Write("★".PadRight(10));
-                Console.BackgroundColor = ConsoleColor.Black;
-                Console.ForegroundColor = ConsoleColor.White;
 
+                Console.Write($"│ {mes.Key}".PadRight(21));
+                Console.Write($"│ {mes.Value.Count}".PadRight(17));
+                var sum = Convert.ToDouble(_fileDir.Sum(s => s.Value.Count));
+                Console.Write($"│ {Math.Round(100 * mes.Value.Count / sum, 2) + "%"}".PadRight(18));
+                Console.Write($"│ {mes.Value.LineCount}".PadRight(17));
+                sum = Convert.ToDouble(_fileDir.Sum(s => s.Value.LineCount));
+                Console.Write($"│ {Math.Round(100 * mes.Value.LineCount / sum, 2) + "%"}".PadRight(18));
+                Console.Write($"│     ");
+                Console.BackgroundColor = _colorArr[((i + 1) % _colorArr.Length)];
+                Console.Write(" ");
+                Console.ResetColor();
+                Console.Write("".PadRight(6));
                 Console.WriteLine("│ ");
                 if (mes.Key != _fileDir.Keys.Last())
                 {
-                    Console.WriteLine("├────────────────────┼────────────────────┼────────────────────┼────────────────────┤ ");
+                    Console.WriteLine("├────────────────────┼────────────────┼─────────────────┼────────────────┼─────────────────┼────────────┤ ");
                 }
                 i++;
             }
-            Console.Write("└────────────────────┴────────────────────┴────────────────────┴────────────────────┘ ".PadRight(64));
+            Console.Write("└────────────────────┴────────────────┴─────────────────┴────────────────┴─────────────────┴────────────┘ ");
             Console.ResetColor();
             Console.Write(" ".PadRight(64));
         }
 
-
+        static void ShowHotBlock()
+        {
+            var sum = Convert.ToDouble(_fileDir.Sum(s => s.Value.Count));
+            var sumLength = 110;
+            Console.WriteLine("");
+            Console.WriteLine("Percentage Legend of File");
+            ShowFile();
+            ShowFile();
+            ShowFile();
+            void ShowFile()
+            {
+                var i = 0;
+                foreach (var item in _fileDir)
+                {
+                    var itemCount = Convert.ToInt32(Math.Round(sumLength * item.Value.Count / sum, MidpointRounding.ToZero));
+                    Console.BackgroundColor = _colorArr[((i + 1) % _colorArr.Length)];
+                    Console.Write("".PadRight(itemCount, ' '));
+                    i++;
+                }
+                Console.ResetColor();
+                Console.WriteLine();
+            }
+            Console.WriteLine("Percentage Legend of Line");
+            var lineSum = Convert.ToDouble(_fileDir.Sum(s => s.Value.LineCount));
+            ShowLine();
+            ShowLine();
+            ShowLine();
+            void ShowLine()
+            {
+                var i = 0;
+                foreach (var item in _fileDir)
+                {
+                    var itemCount = Convert.ToInt32(Math.Round(sumLength * item.Value.LineCount / lineSum, MidpointRounding.ToZero));
+                    Console.BackgroundColor = _colorArr[((i + 1) % _colorArr.Length)];
+                    Console.Write("".PadRight(itemCount, ' '));
+                    i++;
+                }
+                Console.ResetColor();
+                Console.WriteLine();
+            }
+        }
         static ConsoleColor[] _colorArr = new ConsoleColor[] {
                   ConsoleColor.Red,
                   ConsoleColor.Green,
-                  ConsoleColor.White,
                   ConsoleColor.Yellow,
-                  ConsoleColor.Magenta
+                  ConsoleColor.Magenta,
+                  ConsoleColor.DarkRed,
+                  ConsoleColor.DarkGreen,
+                  ConsoleColor.DarkYellow,
+                  ConsoleColor.DarkMagenta
                 };
 
-        /// <summary>
-        /// 显示热点图
-        /// </summary>
-        static void ShowHotMap()
+        class FileCount
         {
-            Console.WriteLine();
-            Console.BackgroundColor = ConsoleColor.Black;
-            Console.ForegroundColor = ConsoleColor.White;
-            var rang = new Point[42, 42];
-            var maxRow = rang.GetLength(0) - 1;
-            var maxCol = rang.GetLength(1) - 1;
-            //初始化
-            for (var r = 0; r <= maxRow; r++)
-            {
-                for (var c = 0; c <= maxCol; c++)
-                {
-                    rang[r, c] = new Point { Value = "  " };
-                }
-            }
-            //边框
-            for (var r = 0; r < maxRow; r++)
-            {
-                rang[r, 0] = new Point { Value = "│" };
-                rang[r, maxCol] = new Point { Value = "│" };
-                rang[0, r] = new Point { Value = "──" };
-                rang[maxRow, r] = new Point { Value = "──" };
-            }
-            rang[maxRow, 0] = new Point { Value = "└" };
-            rang[maxRow, maxCol] = new Point { Value = "┘" };
-            rang[0, 0] = new Point { Value = "┌" };
-            rang[0, maxCol] = new Point { Value = "┐" };
-            LoadFileData();
-            void LoadFileData()
-            {
-                var sum = Convert.ToDouble(_fileDir.Sum(s => s.Value.Count));
-                var x = 0;
-                var y = 0;
-                var colorIndex = 1;
-                var pointCount = 0;
-                var newRan = new Point[maxRow - 1, maxCol - 1];
-                var maxNewRow = newRan.GetLength(0);
-                var maxNewCol = newRan.GetLength(1);
-
-                foreach (var item in _fileDir)
-                {
-                    var itemCount = Convert.ToInt32(Math.Round(maxNewRow * maxNewCol * item.Value.Count / sum, MidpointRounding.ToZero));
-                    var num = pointCount + itemCount;
-
-
-                    for (; pointCount < num; pointCount++)
-                    {
-                        x = pointCount / maxNewRow;
-                        y = pointCount % maxNewCol;
-                        newRan[x, y] = new Point { Value = "★", Color = _colorArr[(colorIndex % _colorArr.Length)] };
-                    }
-                    colorIndex++;
-                }
-                for (var c = 0; c < maxNewCol; c++)
-                {
-                    if (newRan[maxNewRow - 1, c] == null)
-                    {
-                        newRan[maxNewRow - 1, c] = new Point { Value = "  " };
-                    }
-                }
-                for (var r = 0; r < maxNewRow; r++)
-                {
-                    for (var c = 0; c < maxNewCol; c++)
-                    {
-                        rang[r + 1, c + 1] = newRan[r, c];
-                    }
-                }
-            }
-            Console.WriteLine("File Hot Map");
-            Show();
-            void Show()
-            {
-                //显示
-                for (var r = 0; r <= maxRow; r++)
-                {
-                    for (var c = 0; c <= maxCol; c++)
-                    {
-                        if (rang[r, c] != null)
-                        {
-                            Console.ForegroundColor = rang[r, c].Color;
-                            Console.Write(rang[r, c].Value);
-                        }
-                    }
-                    Console.WriteLine();
-                }
-            }
-            void LoadLineData()
-            {
-                var sum = Convert.ToDouble(_fileDir.Sum(s => s.Value.LineCount));
-                var x = 0;
-                var y = 0;
-                var colorIndex = 1;
-                var pointCount = 0;
-                var newRan = new Point[maxRow - 1, maxCol - 1];
-                var maxNewRow = newRan.GetLength(0);
-                var maxNewCol = newRan.GetLength(1);
-
-                foreach (var item in _fileDir)
-                {
-                    var itemCount = Convert.ToInt32(Math.Round(maxNewRow * maxNewCol * item.Value.LineCount / sum, MidpointRounding.ToZero));
-                    var num = pointCount + itemCount;
-
-                    for (; pointCount < num; pointCount++)
-                    {
-                        x = pointCount / maxNewRow;
-                        y = pointCount % maxNewCol;
-                        newRan[x, y] = new Point { Value = "★", Color = _colorArr[(colorIndex % _colorArr.Length)] };
-                    }
-                    colorIndex++;
-                }
-                for (var c = 0; c < maxNewCol; c++)
-                {
-                    if (newRan[maxNewRow - 1, c] == null)
-                    {
-                        newRan[maxNewRow - 1, c] = new Point { Value = "  " };
-                    }
-                }
-                for (var r = 0; r < maxNewRow; r++)
-                {
-                    for (var c = 0; c < maxNewCol; c++)
-                    {
-                        rang[r + 1, c + 1] = newRan[r, c];
-                    }
-                }
-            }
-
-            LoadLineData();
-            Console.WriteLine("Line Hot Map");
-            Show();
-
+            public long Count { get; set; }
+            public long LineCount { get; set; }
         }
-    }
-    class Point
-    {
-        internal string Value { get; set; }
-        internal ConsoleColor Color { get; set; } = ConsoleColor.White;
-    }
-
-    class FileCount
-    {
-        public long Count { get; set; }
-        public long LineCount { get; set; }
     }
 }
